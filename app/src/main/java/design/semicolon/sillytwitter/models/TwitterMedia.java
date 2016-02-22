@@ -40,6 +40,7 @@ public class TwitterMedia extends Model implements Serializable {
             media.imgId = twitterMediaObject.getLong("id");;
             media.mediaUrl = twitterMediaObject.getString("media_url");
             media.tweet = tweet;
+            media.save();
         } catch (JSONException e) {
             e.printStackTrace();
         }

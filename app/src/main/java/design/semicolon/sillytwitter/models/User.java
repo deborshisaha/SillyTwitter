@@ -42,6 +42,7 @@ public class User extends Model implements Serializable {
             user.screenName = userObject.getString("screen_name");
             user.uid = userObject.getLong("id");
             user.userProfilePictureURLString = userObject.getString("profile_image_url");
+            user.save();
         } catch (JSONException e) {
             e.printStackTrace();
         }
