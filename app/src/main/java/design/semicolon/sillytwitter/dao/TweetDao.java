@@ -9,7 +9,7 @@ import design.semicolon.sillytwitter.listerners.OnTweetsLoadedListener;
  * Created by dsaha on 2/20/16.
  */
 public interface TweetDao {
-    public void fetchTimelineTweets( Context context,int page, OnTweetsLoadedListener onTweetsLoadedListener, int cachingStrategy) throws NoNetworkConnectionException;
+    public void fetchTimelineTweets( Context context, long since_id, long max_id, OnTweetsLoadedListener onTweetsLoadedListener, int cachingStrategy) throws NoNetworkConnectionException;
 
     public class CachingStrategy {
         public static final int NetworkOnly = 1;

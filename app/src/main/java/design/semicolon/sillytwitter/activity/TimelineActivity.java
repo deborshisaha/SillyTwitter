@@ -72,7 +72,7 @@ public class TimelineActivity extends AppCompatActivity {
         mOnTweetsLoadedListener = new OnTweetsLoadedListener() {
             @Override
             public void onTweetsLoaded(List<Tweet> tweets, boolean cached) {
-                loading = true;
+                loading = false;
                 swipeContainer.setRefreshing(false);
 
                 if (tweets != null) {
@@ -90,7 +90,7 @@ public class TimelineActivity extends AppCompatActivity {
          * Load data on first load
          */
         try {
-            mTweetDaoImpl.fetchTimelineTweets(TimelineActivity.this, 0, mOnTweetsLoadedListener, TweetDao.CachingStrategy.NetworkOnly);
+            mTweetDaoImpl.fetchTimelineTweets(TimelineActivity.this, 1, 0, mOnTweetsLoadedListener, TweetDao.CachingStrategy.NetworkOnly);
         } catch (NoNetworkConnectionException e) {
             Toast.makeText(TimelineActivity.this, e.getReason() + ' ' + e.getRemedy(), Toast.LENGTH_LONG).show();
         }
@@ -108,6 +108,18 @@ public class TimelineActivity extends AppCompatActivity {
 
                     if (!loading && ((visibleItemCount + firstVisibleItem)*100/totalItemCount) > 90) {
                         loading = true;
+
+                        Tweet tweet = mTweetAdapter.getLastTweet();
+
+                        if (tweet != null) {
+                            long max_id = tweet.getUid();
+
+                            try {
+                                mTweetDaoImpl.fetchTimelineTweets(TimelineActivity.this, 0, max_id, mOnTweetsLoadedListener, TweetDao.CachingStrategy.NetworkOnly);
+                            } catch (NoNetworkConnectionException e) {
+                                Toast.makeText(TimelineActivity.this, e.getReason() + ' ' + e.getRemedy(), Toast.LENGTH_LONG).show();
+                            }
+                        }
                     }
                 }
             }
@@ -118,7 +130,8 @@ public class TimelineActivity extends AppCompatActivity {
             public void onRefresh() {
 
                 try {
-                    mTweetDaoImpl.fetchTimelineTweets(TimelineActivity.this, 0, mOnTweetsLoadedListener, TweetDao.CachingStrategy.NetworkOnly);
+                    swipeContainer.setRefreshing(true);
+                    mTweetDaoImpl.fetchTimelineTweets(TimelineActivity.this, 1, 0, mOnTweetsLoadedListener, TweetDao.CachingStrategy.NetworkOnly);
                 } catch (NoNetworkConnectionException e) {
                     swipeContainer.setRefreshing(false);
                     Toast.makeText(TimelineActivity.this, e.getReason() + ' ' + e.getRemedy(), Toast.LENGTH_LONG).show();
@@ -150,7 +163,7 @@ public class TimelineActivity extends AppCompatActivity {
     }
 
     private void showComposeNewTweetDialog() {
-        User user = new User("Deborshi Saha", "deborshisaha", "http://pbs.twimg.com/profile_images/648751321026138112/8z47ePnq.jpg");
+        User user = new User("Deborshi Saha", "deborshisaha", "http://pbs.twimg.com/profile_images/568456394232168449/fkzqGf9U.jpeg");
 
         ComposeNewTweetFragment frag = ComposeNewTweetFragment.newInstance(user, TimelineActivity.this, new ComposeNewTweetFragment.OnTweetPostedHandler() {
             @Override

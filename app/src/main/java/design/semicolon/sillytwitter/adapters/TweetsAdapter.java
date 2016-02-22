@@ -159,4 +159,12 @@ public class TweetsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             mTweets.add(0, newTweet);
         }
     }
+
+    public Tweet getLastTweet() {
+
+        if (mTweets.size() != 0) {
+            return mTweets.get(mTweets.size() - 1);
+        }
+        return null;
+    }
 }

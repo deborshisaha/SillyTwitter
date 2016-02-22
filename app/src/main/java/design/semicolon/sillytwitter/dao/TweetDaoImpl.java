@@ -30,13 +30,13 @@ public class TweetDaoImpl implements TweetDao {
 
     /**
      * @param context
-     * @param page
+     * @param max_id
      * @param onTweetsLoadedListener
      * @param cachingStrategy
      * @throws NoNetworkConnectionException
      */
     @Override
-    public void fetchTimelineTweets(Context context, int page, final OnTweetsLoadedListener onTweetsLoadedListener, int cachingStrategy) throws NoNetworkConnectionException {
+    public void fetchTimelineTweets(Context context,  long since_id, long max_id, final OnTweetsLoadedListener onTweetsLoadedListener, int cachingStrategy) throws NoNetworkConnectionException {
 
         int count = 0;
 
@@ -69,7 +69,7 @@ public class TweetDaoImpl implements TweetDao {
         }
 
         // Get timeline
-        client.getHomeTimeLine(count, new JsonHttpResponseHandler(){
+        client.getHomeTimeLine(count, since_id, max_id, new JsonHttpResponseHandler(){
 
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONArray json) {

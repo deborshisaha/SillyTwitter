@@ -22,11 +22,19 @@ public class SillyTwitterClient extends OAuthBaseClient {
         super(context, REST_API_CLASS, REST_URL, REST_CONSUMER_KEY, REST_CONSUMER_SECRET, REST_CALLBACK_URL);
     }
 
-    public void getHomeTimeLine(int count, AsyncHttpResponseHandler handler) {
+    public void getHomeTimeLine(int count, long since_id, long max_id, AsyncHttpResponseHandler handler) {
         String urlString = getApiUrl("statuses/home_timeline.json");
         RequestParams params = new RequestParams();
-        params.put("since_id",1);
+
         params.put("count", count);
+
+        if (since_id != 0) {
+            params.put("since_id", since_id);
+        }
+
+        if (max_id != 0) {
+            params.put("max_id", max_id - 1);
+        }
 
         getClient().get(urlString, params, handler);
     }

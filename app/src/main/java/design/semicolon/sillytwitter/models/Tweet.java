@@ -156,4 +156,8 @@ public class Tweet extends Model implements Serializable {
 
         return null;
     }
+
+    public long getUid() {
+        return uid;
+    }
 }
