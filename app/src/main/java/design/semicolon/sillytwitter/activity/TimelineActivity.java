@@ -1,5 +1,6 @@
 package design.semicolon.sillytwitter.activity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
@@ -12,9 +13,15 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import com.activeandroid.ActiveAndroid;
+import com.loopj.android.http.JsonHttpResponseHandler;
+
+import org.apache.http.Header;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.List;
 
@@ -24,9 +31,11 @@ import design.semicolon.sillytwitter.R;
 import design.semicolon.sillytwitter.adapters.TweetsAdapter;
 import design.semicolon.sillytwitter.dao.TweetDao;
 import design.semicolon.sillytwitter.dao.TweetDaoImpl;
+import design.semicolon.sillytwitter.dao.UserDaoImpl;
 import design.semicolon.sillytwitter.exceptions.NoNetworkConnectionException;
 import design.semicolon.sillytwitter.fragments.ComposeNewTweetFragment;
 import design.semicolon.sillytwitter.listerners.OnTweetsLoadedListener;
+import design.semicolon.sillytwitter.listerners.OnUsersLoadedListener;
 import design.semicolon.sillytwitter.models.Tweet;
 import design.semicolon.sillytwitter.models.User;
 
@@ -39,7 +48,10 @@ public class TimelineActivity extends AppCompatActivity {
     SwipeRefreshLayout swipeContainer;
 
     private OnTweetsLoadedListener mOnTweetsLoadedListener;
+    private OnUsersLoadedListener mOnUsersLoadedListener;
+
     private TweetDaoImpl mTweetDaoImpl;
+    private UserDaoImpl mUserDaoImpl;
     private TweetsAdapter mTweetAdapter;
     private LinearLayoutManager mLinearLayoutManager;
 
@@ -86,6 +98,10 @@ public class TimelineActivity extends AppCompatActivity {
             mTweetDaoImpl = new TweetDaoImpl();
         }
 
+        if (mUserDaoImpl == null) {
+            mUserDaoImpl = new  UserDaoImpl();
+        }
+
         /**
          * Load data on first load
          */
@@ -94,6 +110,13 @@ public class TimelineActivity extends AppCompatActivity {
         } catch (NoNetworkConnectionException e) {
             Toast.makeText(TimelineActivity.this, e.getReason() + ' ' + e.getRemedy(), Toast.LENGTH_LONG).show();
         }
+
+        try {
+            mUserDaoImpl.reloadUser(TimelineActivity.this, null);
+        } catch (NoNetworkConnectionException e) {
+            Toast.makeText(TimelineActivity.this, e.getReason() + ' ' + e.getRemedy(), Toast.LENGTH_LONG).show();
+        }
+
 
         mTimelineRecyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -153,7 +176,11 @@ public class TimelineActivity extends AppCompatActivity {
 
         switch(item.getItemId()){
             case R.id.menu_new_tweet:{
-                showComposeNewTweetDialog();
+                try {
+                    showComposeNewTweetDialog();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
                 break;
             }
             default:
@@ -162,8 +189,8 @@ public class TimelineActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void showComposeNewTweetDialog() {
-        User user = new User("Deborshi Saha", "deborshisaha", "http://pbs.twimg.com/profile_images/568456394232168449/fkzqGf9U.jpeg");
+    private void showComposeNewTweetDialog() throws JSONException {
+        User user = User.currentUser(TimelineActivity.this);
 
         ComposeNewTweetFragment frag = ComposeNewTweetFragment.newInstance(user, TimelineActivity.this, new ComposeNewTweetFragment.OnTweetPostedHandler() {
             @Override
