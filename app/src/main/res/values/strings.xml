@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">SillyTwitter</string>
+    <string name="login_label">Login</string>
+    <string name="new_tweet">New Tweet</string>
+</resources>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="design.semicolon.sillytwitter">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+
+    <meta-data android:name="AA_DB_NAME" android:value="SillyTwitter.db" />
+    <meta-data android:name="AA_DB_VERSION" android:value="201602210226" />
+
+    <meta-data
+        android:name="AA_MODELS_TWEET"
+        android:value="design.semicolon.sillytwitter.models.Tweet" />
+    <meta-data
+        android:name="AA_MODELS_USER"
+        android:value="design.semicolon.sillytwitter.models.User" />
+    <meta-data
+        android:name="AA_MODELS_IMAGE"
+        android:value="design.semicolon.sillytwitter.models.TwitterMedia" />
+
+    <application
+        android:name=".SillyTwitterApplication"
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+
+        <activity
+            android:name=".activity.LoginActivity"
+            android:theme="@style/AppTheme"
+            android:label="@string/app_name" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="cpsillytwitter"
+                    android:scheme="oauth" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".activity.TimelineActivity" > </activity>
+    </application>
+
+</manifest>
