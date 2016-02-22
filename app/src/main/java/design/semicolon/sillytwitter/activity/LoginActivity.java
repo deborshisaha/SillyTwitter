@@ -8,6 +8,7 @@ import android.view.View;
 import com.codepath.oauth.OAuthLoginActionBarActivity;
 
 import design.semicolon.sillytwitter.R;
+import design.semicolon.sillytwitter.models.TwitterMedia;
 import design.semicolon.sillytwitter.restclient.SillyTwitterClient;
 
 /**
@@ -35,11 +36,13 @@ public class LoginActivity extends  OAuthLoginActionBarActivity<SillyTwitterClie
 
     @Override
     public void onLoginFailure(Exception e) {
-
+        e.printStackTrace();
     }
 
     public void loginToRest(View view) {
-
-        getClient().connect();
+        SillyTwitterClient client = getClient();
+        if (client != null) {
+            client.connect();
+        }
     }
 }

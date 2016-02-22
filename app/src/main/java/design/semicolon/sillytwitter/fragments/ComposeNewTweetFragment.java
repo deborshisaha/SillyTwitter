@@ -4,7 +4,9 @@ import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.FragmentManager;
+import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,14 +16,24 @@ import android.view.Window;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import design.semicolon.sillytwitter.R;
+import design.semicolon.sillytwitter.SillyTwitterApplication;
+import design.semicolon.sillytwitter.models.Tweet;
 import design.semicolon.sillytwitter.models.User;
+import design.semicolon.sillytwitter.restclient.SillyTwitterClient;
+
 import android.support.v4.app.DialogFragment;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.JsonHttpResponseHandler;
 import com.makeramen.roundedimageview.RoundedImageView;
+
+import org.apache.http.Header;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 public class ComposeNewTweetFragment extends DialogFragment {
 
@@ -37,9 +49,6 @@ public class ComposeNewTweetFragment extends DialogFragment {
     @Bind(R.id.characters_left_textview)
     TextView characters_left_textview;
 
-    @Bind(R.id.tweet_edittext)
-    EditText tweet_edittext;
-
     @Bind(R.id.post_tweet_button)
     ImageButton post_tweet_button;
 
@@ -47,16 +56,27 @@ public class ComposeNewTweetFragment extends DialogFragment {
 
     public static final String USER_KEY = "user";
 
+    private boolean goodToPost = false;
+
+    private SillyTwitterClient client;
+
+    private TextInputLayout composeTweetEditTextInputlayout ;
+
     public ComposeNewTweetFragment() {}
 
-    public static ComposeNewTweetFragment newInstance(User user, Context context) {
+    public OnTweetPostedHandler mOnTweetPostedHandler;
+
+    public static ComposeNewTweetFragment newInstance(User user, Context context, OnTweetPostedHandler handler) {
         ComposeNewTweetFragment frag = new ComposeNewTweetFragment();
         frag.context = context;
+        frag.mOnTweetPostedHandler = handler;
         Bundle args = new Bundle();
         args.putSerializable(USER_KEY, user);
         frag.setArguments(args);
         return frag;
     }
+
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -75,12 +95,60 @@ public class ComposeNewTweetFragment extends DialogFragment {
         User user = (User) getArguments().getSerializable(USER_KEY);
 
         current_user_name_textview.setText(user.getFullName());
-        current_user_screenname_textview.setText("@"+user.getUserName());
-        characters_left_textview.setText("140");
+        current_user_screenname_textview.setText("@" + user.getUserName());
+
+        post_tweet_button.setEnabled(false);
+        post_tweet_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if (client == null) {
+                    client = SillyTwitterApplication.getRestClient();
+                }
+
+                EditText editText = (EditText) composeTweetEditTextInputlayout.getEditText();
+                client.postTweet(editText.getText().toString(), new JsonHttpResponseHandler(){
+
+                    @Override
+                    public void onSuccess(int statusCode, Header[] headers, JSONObject tweetJSONObject) {
+                        super.onSuccess(statusCode, headers, tweetJSONObject);
+
+                        Tweet tweet = Tweet.fromJSON(tweetJSONObject);
+                        tweet.save();
+                        mOnTweetPostedHandler.onTweetPosted(tweet);
+
+                        ComposeNewTweetFragment.this.dismiss();
+                    }
+
+                });
+            }
+        });
 
         if (user.getUserProfilePictureURLString()!= null) {
             Glide.with(context).load(user.getUserProfilePictureURLString()).placeholder(R.drawable.placeholder).into(current_user_profile_picture_imageview);
         }
+
+        composeTweetEditTextInputlayout = (TextInputLayout) view.findViewById(R.id.username_text_input_layout);
+        composeTweetEditTextInputlayout.getEditText().addTextChangedListener(new TextWatcher() {
+
+            @Override
+            public void onTextChanged(CharSequence text, int start, int count, int after) {
+                int charactersLeft = 140 - text.length();
+                characters_left_textview.setText(charactersLeft +" characters left");
+
+                if (charactersLeft == 140 || charactersLeft < 0) {
+                    post_tweet_button.setEnabled(false);
+                } else {
+                    post_tweet_button.setEnabled(true);
+                }
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
     }
 
     @Override
@@ -90,4 +158,8 @@ public class ComposeNewTweetFragment extends DialogFragment {
         return dialog;
     }
 
+
+    public interface OnTweetPostedHandler {
+        void onTweetPosted(Tweet newTweet);
+    }
 }

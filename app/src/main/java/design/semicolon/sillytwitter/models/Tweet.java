@@ -42,6 +42,10 @@ public class Tweet extends Model implements Serializable {
         return createdAt;
     }
 
+    public String getUidStr() {
+        return uidStr;
+    }
+
     public static Tweet fromJSON(JSONObject tweetObject) {
 
         Tweet tweet = new Tweet();

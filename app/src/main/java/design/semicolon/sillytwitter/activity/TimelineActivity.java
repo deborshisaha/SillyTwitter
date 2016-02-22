@@ -1,5 +1,6 @@
 package design.semicolon.sillytwitter.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -151,8 +152,17 @@ public class TimelineActivity extends AppCompatActivity {
     private void showComposeNewTweetDialog() {
         User user = new User("Deborshi Saha", "deborshisaha", "http://pbs.twimg.com/profile_images/648751321026138112/8z47ePnq.jpg");
 
-        ComposeNewTweetFragment frag = ComposeNewTweetFragment.newInstance(user, TimelineActivity.this);
+        ComposeNewTweetFragment frag = ComposeNewTweetFragment.newInstance(user, TimelineActivity.this, new ComposeNewTweetFragment.OnTweetPostedHandler() {
+            @Override
+            public void onTweetPosted(Tweet newTweet) {
+                mTweetAdapter.addTweet(newTweet);
+                mTweetAdapter.notifyItemInserted(0);
+                mTimelineRecyclerView.smoothScrollToPosition(0);
+            }
+        });
+
         FragmentManager fm = getSupportFragmentManager();
         frag.show(fm, "compose_new_tweet_fragment");
     }
+
 }

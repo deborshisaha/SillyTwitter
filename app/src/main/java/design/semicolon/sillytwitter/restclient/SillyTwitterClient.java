@@ -14,8 +14,8 @@ import org.scribe.builder.api.TwitterApi;
 public class SillyTwitterClient extends OAuthBaseClient {
     public static final Class<? extends Api> REST_API_CLASS = TwitterApi.class; // Change this
     public static final String REST_URL = "https://api.twitter.com/1.1"; // Change this, base API URL
-    public static final String REST_CONSUMER_KEY = "5zCYNnn1WTZPdWNLI5L6cxUwO";       // Change this
-    public static final String REST_CONSUMER_SECRET = "v06NhwfGell242oQILYWEZ9JE9x7LcfPQVxutcOAJOZoqqQxeY"; // Change this
+    public static final String REST_CONSUMER_KEY = "O1iJFV7Q4VVOWVkurejzcbHTI";       // Change this
+    public static final String REST_CONSUMER_SECRET = "cPTz3d75lMbwqQIptSb6oM048y7TzxaKPDkscqm5QiRTCUqGph"; // Change this
     public static final String REST_CALLBACK_URL = "oauth://cpsillytwitter";
 
     public SillyTwitterClient(Context context) {
@@ -29,6 +29,14 @@ public class SillyTwitterClient extends OAuthBaseClient {
         params.put("count", count);
 
         getClient().get(urlString, params, handler);
+    }
+
+    public void postTweet(String text, AsyncHttpResponseHandler handler) {
+
+        String apiUrl = getApiUrl("statuses/update.json");
+        RequestParams params = new RequestParams();
+        params.put("status", text);
+        getClient().post(apiUrl, params, handler);
     }
 
 }

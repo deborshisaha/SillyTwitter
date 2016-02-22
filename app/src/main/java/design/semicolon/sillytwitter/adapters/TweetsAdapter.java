@@ -47,13 +47,13 @@ public class TweetsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
         for (Tweet tweet: tweets) {
             Log.d("DEBUG", "tweet:"+tweet.getId()+" content:"+tweet.getText());
-            if (!mTweetInRecyclerViewMap.containsKey(tweet.getId())) {
+            if (!mTweetInRecyclerViewMap.containsKey(tweet.getUidStr())) {
                 // Not in the list, add it
-                Log.d("DEBUG", "Adding tweet:"+tweet.getId());
-                mTweetInRecyclerViewMap.put(tweet.getId().toString(), true);
+                Log.d("DEBUG", "Adding tweet:"+tweet.getUidStr());
+                mTweetInRecyclerViewMap.put(tweet.getUidStr().toString(), true);
                 mTweets.add(tweet);
             } else {
-                Log.d("DEBUG", "Not Adding tweet:"+tweet.getId()+" content:"+tweet.getText());
+                Log.d("DEBUG", "Not Adding tweet:"+tweet.getUidStr()+" content:"+tweet.getText());
             }
         }
 
@@ -146,5 +146,17 @@ public class TweetsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
         // Tweet has no image
         return VIEW_WITH_NO_IMAGE;
+    }
+
+    public void addTweet(Tweet newTweet) {
+
+        if (mTweets == null) {
+            mTweets = new ArrayList<Tweet>();
+        }
+
+        if (!mTweetInRecyclerViewMap.containsKey(newTweet.getUidStr())) {
+            mTweetInRecyclerViewMap.put(newTweet.getUidStr(), true);
+            mTweets.add(0, newTweet);
+        }
     }
 }
