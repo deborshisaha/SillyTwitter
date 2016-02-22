@@ -59,7 +59,7 @@ public class TweetDaoImpl implements TweetDao {
          * To modify throttling
          */
         if (NetworkConnectivityManager.isConnectedToInternetViaWifi(context)) {
-            count = 10;
+            count = 20;
         } else {
             count = 10;
         }

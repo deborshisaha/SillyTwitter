@@ -26,7 +26,9 @@ public class SillyTwitterClient extends OAuthBaseClient {
         String urlString = getApiUrl("statuses/home_timeline.json");
         RequestParams params = new RequestParams();
 
-        params.put("count", count);
+        if (count != 0) {
+            params.put("count", since_id);
+        }
 
         if (since_id != 0) {
             params.put("since_id", since_id);
