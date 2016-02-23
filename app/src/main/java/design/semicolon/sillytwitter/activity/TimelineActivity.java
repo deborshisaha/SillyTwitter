@@ -183,6 +183,9 @@ public class TimelineActivity extends AppCompatActivity {
                 }
                 break;
             }
+            case R.id.menu_profile:{
+                Log.d("DEBUG", "Do something");
+            }
             default:
                 break;
         }

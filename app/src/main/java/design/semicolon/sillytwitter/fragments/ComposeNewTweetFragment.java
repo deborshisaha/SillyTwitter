@@ -76,14 +76,11 @@ public class ComposeNewTweetFragment extends DialogFragment {
         return frag;
     }
 
-
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.compose_new_tweet_fragment, container, false);
         ButterKnife.bind(this, view);
-
         return view;
     }
 

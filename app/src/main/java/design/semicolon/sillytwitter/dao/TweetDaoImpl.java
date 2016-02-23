@@ -1,6 +1,7 @@
 package design.semicolon.sillytwitter.dao;
 
 import android.content.Context;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.activeandroid.ActiveAndroid;
@@ -27,6 +28,8 @@ import design.semicolon.sillytwitter.restclient.SillyTwitterClient;
 public class TweetDaoImpl implements TweetDao {
 
     private SillyTwitterClient client;
+
+    private static final String LAST_TWEET_ID = "LAST_TWEET_ID";
 
     /**
      * @param context
@@ -108,7 +111,6 @@ public class TweetDaoImpl implements TweetDao {
         List<Tweet> tweets = new ArrayList<Tweet>();
 
         try {
-
             ActiveAndroid.beginTransaction();
             try {
                 Log.d("DEBUG", "number of tweets:"+tweetsJSONArray.length());
@@ -117,6 +119,7 @@ public class TweetDaoImpl implements TweetDao {
                     Tweet tweet = Tweet.fromJSON(tweetJSONObject);
                     if (tweet != null) {
                         tweet.getUser().save();
+                        tweet.persistMedia();
                         tweet.save();
                         tweets.add(tweet);
                     }
@@ -130,5 +133,13 @@ public class TweetDaoImpl implements TweetDao {
         }
 
         return tweets;
+    }
+
+    private static long getNewestFetchedId(Context context) {
+        return PreferenceManager.getDefaultSharedPreferences(context).getLong(LAST_TWEET_ID, 0);
+    }
+
+    private static void setNewestFetchedId(Context context, long id) {
+        PreferenceManager.getDefaultSharedPreferences(context).edit().putLong(LAST_TWEET_ID, id).apply();
     }
 }

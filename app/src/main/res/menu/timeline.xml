@@ -7,4 +7,10 @@
         app:showAsAction="always"
         android:title="@string/new_tweet"
         android:icon = "@drawable/ic_tweet" />
+
+    <item
+        android:id="@+id/menu_profile"
+        app:showAsAction="always"
+        android:title="@string/user_profile"
+        android:icon = "@drawable/ic_profile" />
 </menu>

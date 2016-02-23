@@ -98,6 +98,12 @@ public class Tweet extends Model implements Serializable {
         return tweet;
     }
 
+    public void persistMedia () {
+        for (TwitterMedia media: twitterMedias) {
+            media.save();
+        }
+    }
+
     public static List<Tweet> all() {
         return new Select().from(Tweet.class).orderBy("timestamp DESC").execute();
     }
