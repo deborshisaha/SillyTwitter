@@ -37,6 +37,7 @@ import design.semicolon.sillytwitter.fragments.ComposeNewTweetFragment;
 import design.semicolon.sillytwitter.listerners.OnTweetsLoadedListener;
 import design.semicolon.sillytwitter.listerners.OnUsersLoadedListener;
 import design.semicolon.sillytwitter.models.Tweet;
+import design.semicolon.sillytwitter.models.TwitterMedia;
 import design.semicolon.sillytwitter.models.User;
 
 public class TimelineActivity extends AppCompatActivity {
@@ -65,7 +66,17 @@ public class TimelineActivity extends AppCompatActivity {
 
         ActiveAndroid.setLoggingEnabled(true);
 
-        Tweet.deleteAll();
+//        if (Tweet.all().size() !=0 ) {
+//            Tweet.deleteAll();
+//        }
+//
+//        if (TwitterMedia.all().size() !=0 ) {
+//            TwitterMedia.deleteAll();
+//        }
+//
+//        if (User.all().size() !=0 ) {
+//            User.deleteAll();
+//        }
 
         // Bundle
         ButterKnife.bind(this);
@@ -118,6 +129,7 @@ public class TimelineActivity extends AppCompatActivity {
         }
 
 
+        /*
         mTimelineRecyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -138,7 +150,7 @@ public class TimelineActivity extends AppCompatActivity {
                             long max_id = tweet.getUid();
 
                             try {
-                                mTweetDaoImpl.fetchTimelineTweets(TimelineActivity.this, 0, max_id, mOnTweetsLoadedListener, TweetDao.CachingStrategy.NetworkOnly);
+                                mTweetDaoImpl.fetchTimelineTweets(TimelineActivity.this, 0, max_id, mOnTweetsLoadedListener, TweetDao.CachingStrategy.CacheOnly);
                             } catch (NoNetworkConnectionException e) {
                                 Toast.makeText(TimelineActivity.this, e.getReason() + ' ' + e.getRemedy(), Toast.LENGTH_LONG).show();
                             }
@@ -154,13 +166,14 @@ public class TimelineActivity extends AppCompatActivity {
 
                 try {
                     swipeContainer.setRefreshing(true);
-                    mTweetDaoImpl.fetchTimelineTweets(TimelineActivity.this, 1, 0, mOnTweetsLoadedListener, TweetDao.CachingStrategy.NetworkOnly);
+                    mTweetDaoImpl.fetchTimelineTweets(TimelineActivity.this, 1, 0, mOnTweetsLoadedListener, TweetDao.CachingStrategy.CacheOnly);
                 } catch (NoNetworkConnectionException e) {
                     swipeContainer.setRefreshing(false);
                     Toast.makeText(TimelineActivity.this, e.getReason() + ' ' + e.getRemedy(), Toast.LENGTH_LONG).show();
                 }
             }
         });
+        */
     }
 
     @Override

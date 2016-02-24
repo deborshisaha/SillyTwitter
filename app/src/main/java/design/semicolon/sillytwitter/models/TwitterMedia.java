@@ -6,11 +6,14 @@ import android.os.Parcelable;
 import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
+import com.activeandroid.query.Delete;
+import com.activeandroid.query.Select;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.Serializable;
+import java.util.List;
 
 @Table(name = "TwitterMedia")
 public class TwitterMedia extends Model implements Serializable {
@@ -40,12 +43,19 @@ public class TwitterMedia extends Model implements Serializable {
             media.imgId = twitterMediaObject.getLong("id");;
             media.mediaUrl = twitterMediaObject.getString("media_url");
             media.tweet = tweet;
-            media.save();
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
         return media;
+    }
+
+    public static List<TwitterMedia> all() {
+        return new Select().from(TwitterMedia.class).execute();
+    }
+
+    public static void deleteAll() {
+        new Delete().from(TwitterMedia.class).execute();
     }
 
 //    @Override

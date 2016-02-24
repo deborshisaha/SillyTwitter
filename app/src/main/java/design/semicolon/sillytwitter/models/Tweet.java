@@ -27,7 +27,7 @@ import design.semicolon.sillytwitter.helpers.DateHelper;
 public class Tweet extends Model implements Serializable {
 
     public User getUser() {
-        return user;
+        return load(User.class, this.getId());
     }
 
     public String getText() {
@@ -58,33 +58,22 @@ public class Tweet extends Model implements Serializable {
             tweet.createdAt = tweetObject.getString("created_at");
             tweet.retweet_count = tweetObject.getInt("retweet_count");
             tweet.favorite_count = tweetObject.getInt("favorite_count");
-
             tweet.timestamp = DateHelper.convertToDate(tweetObject.getString("created_at")).getTime();
 
             if (tweetObject.optJSONObject("extended_entities") != null) {
                 JSONObject extendedEntitiesJSONObject = tweetObject.getJSONObject("extended_entities");
 
-
                 if (extendedEntitiesJSONObject.optJSONArray("media")!= null) {
                     JSONArray mediasJSONArray = extendedEntitiesJSONObject.getJSONArray("media");
-                    ActiveAndroid.beginTransaction();
-                    try {
+                    for (int i = 0; i < mediasJSONArray.length(); i++) {
 
-                        for (int i = 0; i < mediasJSONArray.length(); i++) {
-
-                            JSONObject multimediaJSONObject = mediasJSONArray.getJSONObject(i);
-                            TwitterMedia twitterMedia = TwitterMedia.fromJSON(tweet,multimediaJSONObject);
-                            twitterMedia.save();
-                            if (tweet.twitterMedias == null){
-                                tweet.twitterMedias = new ArrayList<TwitterMedia>();
-                            }
-
-                            tweet.twitterMedias.add(twitterMedia);
-                            break;
+                        JSONObject multimediaJSONObject = mediasJSONArray.getJSONObject(i);
+                        TwitterMedia twitterMedia = TwitterMedia.fromJSON(tweet,multimediaJSONObject);
+                        if (tweet.twitterMedias == null){
+                            tweet.twitterMedias = new ArrayList<TwitterMedia>();
                         }
-                        ActiveAndroid.setTransactionSuccessful();
-                    } finally {
-                        ActiveAndroid.endTransaction();
+
+                        tweet.twitterMedias.add(twitterMedia);
                     }
                 }
             } else {
@@ -99,6 +88,9 @@ public class Tweet extends Model implements Serializable {
     }
 
     public void persistMedia () {
+
+        if (twitterMedias == null) {return;}
+
         for (TwitterMedia media: twitterMedias) {
             media.save();
         }
@@ -122,7 +114,7 @@ public class Tweet extends Model implements Serializable {
 
     private List<TwitterMedia> twitterMedias;
 
-    @Column(name = "user", index = true, onUpdate = Column.ForeignKeyAction.CASCADE, onDelete = Column.ForeignKeyAction.CASCADE)
+    @Column(name = "user", index = true, onUpdate = Column.ForeignKeyAction.CASCADE)
     private User user;
 
     @Column(name = "text")

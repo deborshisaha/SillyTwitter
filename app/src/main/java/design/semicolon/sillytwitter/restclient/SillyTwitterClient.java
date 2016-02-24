@@ -27,7 +27,7 @@ public class SillyTwitterClient extends OAuthBaseClient {
         RequestParams params = new RequestParams();
 
         if (count != 0) {
-            params.put("count", since_id);
+            params.put("count", count);
         }
 
         if (since_id != 0) {

@@ -6,6 +6,8 @@ import android.preference.PreferenceManager;
 import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
+import com.activeandroid.query.Delete;
+import com.activeandroid.query.Select;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -17,6 +19,35 @@ import java.util.List;
 public class User extends Model implements Serializable {
 
     private static final String CURRENT_USER = "current_user";
+
+
+    @Column(name = "name")
+    private String fullName;
+
+    @Column(name = "screen_name")
+    private String screenName;
+
+    @Column(name = "profile_image_url")
+    private String userProfilePictureURLString;
+
+    @Column(name = "uid", unique = true, index = true, onUniqueConflict = Column.ConflictAction.REPLACE)
+    private long uid; // Unique id of the user
+
+    public static void setCurrentUser(Context context, JSONObject jsonObject){
+        PreferenceManager.getDefaultSharedPreferences(context).edit().putString(CURRENT_USER, jsonObject.toString()).apply();
+    }
+
+    public static User currentUser(Context context) throws JSONException {
+
+        String userJsonString = PreferenceManager.getDefaultSharedPreferences(context).getString(CURRENT_USER, null);
+
+        if (userJsonString != null || userJsonString.length() != 0){
+            JSONObject jsonObject = new JSONObject(userJsonString);
+            return User.fromJSON(jsonObject);
+        } else {
+            return null;
+        }
+    }
 
     public User(String fullName, String screenName, String ppURL) {
         this.fullName = fullName;
@@ -54,50 +85,15 @@ public class User extends Model implements Serializable {
         return user;
     }
 
+    public static List<User> all() {
+        return new Select().from(User.class).execute();
+    }
+
+    public static void deleteAll() {
+        new Delete().from(User.class).execute();
+    }
+
     public List<Tweet> tweets() {
         return getMany(Tweet.class, "Tweet");
     }
-
-    @Column(name = "name")
-    private String fullName;
-
-    @Column(name = "screen_name")
-    private String screenName;
-
-    @Column(name = "profile_image_url")
-    private String userProfilePictureURLString;
-
-    @Column(name = "uid", unique = true, index = true, onUniqueConflict = Column.ConflictAction.REPLACE)
-    private long uid; // Unique id of the user
-
-    public static void setCurrentUser(Context context, JSONObject jsonObject){
-        PreferenceManager.getDefaultSharedPreferences(context).edit().putString(CURRENT_USER, jsonObject.toString()).apply();
-    }
-
-    public static User currentUser(Context context) throws JSONException {
-
-        String userJsonString = PreferenceManager.getDefaultSharedPreferences(context).getString(CURRENT_USER, null);
-
-        if (userJsonString != null || userJsonString.length() != 0){
-            JSONObject jsonObject = new JSONObject(userJsonString);
-            return User.fromJSON(jsonObject);
-        } else {
-            return null;
-        }
-    }
-
-//    public static  JSONObject toJSON(User user) {
-//        JSONObject jsonObject = new JSONObject();
-//
-//        try {
-//            jsonObject.put("name", user.getFullName());
-//            jsonObject.put("screen_name", user.getUserName());
-//            jsonObject.put("id", user.uid);
-//            jsonObject.put("profile_image_url", user.userProfilePictureURLString);
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
-//
-//        return JSONObject;
-//    }
 }
