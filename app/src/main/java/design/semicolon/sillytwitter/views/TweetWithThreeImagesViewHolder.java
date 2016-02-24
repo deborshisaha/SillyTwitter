@@ -22,11 +22,8 @@ public class TweetWithThreeImagesViewHolder extends TweetViewHolder {
     @Bind(R.id.image_three_imageview)
     ImageView image_three_imageview;
 
-    Context context;
-
     public TweetWithThreeImagesViewHolder(View itemView, Context context){
         super(itemView, context);
-        this.context = context;
 
         ButterKnife.bind(this, itemView);
     }

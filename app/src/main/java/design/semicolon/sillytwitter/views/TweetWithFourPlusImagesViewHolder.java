@@ -25,14 +25,8 @@ public class TweetWithFourPlusImagesViewHolder extends TweetViewHolder {
     @Bind(R.id.image_four_imageview)
     ImageView image_four_imageview;
 
-    @Bind(R.id.image_four_plus_imageview)
-    ImageView image_four_plus_imageview;
-
-    Context context;
-
     public TweetWithFourPlusImagesViewHolder(View itemView, Context context){
         super(itemView, context);
-        this.context = context;
 
         ButterKnife.bind(this, itemView);
     }

@@ -48,7 +48,7 @@ public class TweetDaoImpl implements TweetDao {
     @Override
     public void fetchTimelineTweets(Context context,  long since_id, long max_id, final OnTweetsLoadedListener onTweetsLoadedListener, int cachingStrategy) throws NoNetworkConnectionException {
 
-        /*
+
         if (CachingStrategy.CacheOnly == cachingStrategy) {
 
             try {
@@ -66,6 +66,7 @@ public class TweetDaoImpl implements TweetDao {
                 Log.d("DEBUG", "Number of TwitterMedia in DB AFTER Tweet persistence : " + TwitterMedia.all().size());
 
                 Log.d("DEBUG", "Finish");
+                onTweetsLoadedListener.onTweetsLoaded(Tweet.all(), false);
             }
             catch(Throwable t) {
                 t.printStackTrace();
@@ -73,7 +74,6 @@ public class TweetDaoImpl implements TweetDao {
 
             return;
         }
-        */
 
         int count = 0;
 
@@ -181,9 +181,16 @@ public class TweetDaoImpl implements TweetDao {
         try {
             ActiveAndroid.beginTransaction();
             for (Tweet tweet : tweets) {
-                tweet.getUser().save();
-                tweet.persistMedia();
+
+                User user = tweet.getUser();
+
+                if (user != null){
+                    tweet.setUser(user.saveIfNecessaryElseGetUser());
+                }
+
                 tweet.save();
+                tweet.persistMedia();
+
                 if (tweet.getUser()!= null){
                     Log.d("DEBUG", tweet.getUser().getFullName());
                 }

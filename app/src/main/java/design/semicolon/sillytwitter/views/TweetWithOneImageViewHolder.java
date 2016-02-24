@@ -16,11 +16,8 @@ public class TweetWithOneImageViewHolder extends TweetViewHolder {
     @Bind(R.id.image_one_imageview)
     ImageView image_one_imageview;
 
-    Context context;
-
     public TweetWithOneImageViewHolder(View itemView, Context context){
         super(itemView, context);
-        this.context = context;
 
         ButterKnife.bind(this, itemView);
     }

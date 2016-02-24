@@ -24,7 +24,7 @@ public class TwitterMedia extends Model implements Serializable {
     @Column(name = "media_url")
     private String mediaUrl;
 
-    @Column(name = "Tweet", index = true)
+    @Column(name = "Tweet")
     private Tweet tweet;
 
     public Tweet getTweet() {
@@ -70,8 +70,9 @@ public class TwitterMedia extends Model implements Serializable {
 //        dest.writeParcelable(this.tweet, 0);
 //    }
 //
-//    public TwitterMedia() {
-//    }
+    public TwitterMedia() {
+        super();
+    }
 //
 //    protected TwitterMedia(Parcel in) {
 //        this.id = in.readString();

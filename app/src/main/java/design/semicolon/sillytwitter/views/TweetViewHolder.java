@@ -41,11 +41,13 @@ public class TweetViewHolder extends RecyclerView.ViewHolder {
     @Bind(R.id.retweet_count_textview)
     TextView retweet_count_textview;
 
-    Context context;
+    public Context context;
 
     public TweetViewHolder(View itemView) {
         super(itemView);
-        ButterKnife.bind(this, itemView);
+        if (this.getClass() == TweetViewHolder.class){
+            ButterKnife.bind(this, itemView);
+        }
     }
 
     public TweetViewHolder(View itemView, Context context) {
@@ -64,7 +66,7 @@ public class TweetViewHolder extends RecyclerView.ViewHolder {
 
         if (user != null){
             this.user_full_name_textview.setText(user.getFullName());
-            this.username_textview.setText("@"+ user.getUserName());
+            this.username_textview.setText("@" + user.getUserName());
         }
 
         this.relative_time_textview.setText(tweet.getCreatedAt(true));

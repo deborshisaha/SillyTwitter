@@ -114,14 +114,15 @@
             android:layout_toRightOf="@+id/rlRetweetHolder">
 
             <ImageView
-                android:layout_width="22dp"
-                android:layout_height="22dp"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
                 android:src="@drawable/ic_fav_grey"
                 android:id="@+id/favorite_icon"/>
 
             <TextView
                 android:layout_width="60dp"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="4dp"
                 android:id="@+id/favorite_count_textview"
                 android:layout_toRightOf="@+id/favorite_icon"/>
 

@@ -4,7 +4,6 @@ import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.ArrayList;
@@ -15,7 +14,6 @@ import design.semicolon.sillytwitter.R;
 import design.semicolon.sillytwitter.activity.TimelineActivity;
 import design.semicolon.sillytwitter.models.Tweet;
 import design.semicolon.sillytwitter.views.TweetViewHolder;
-import design.semicolon.sillytwitter.views.TweetWithFourImagesViewHolder;
 import design.semicolon.sillytwitter.views.TweetWithFourPlusImagesViewHolder;
 import design.semicolon.sillytwitter.views.TweetWithOneImageViewHolder;
 import design.semicolon.sillytwitter.views.TweetWithThreeImagesViewHolder;
@@ -88,9 +86,6 @@ public class TweetsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             case VIEW_WITH_3_IMAGES:
                 viewHolder = new TweetWithThreeImagesViewHolder(inflater.inflate(R.layout.tweet_with_3_images, viewGroup, false), this.mContext);
                 break;
-            case VIEW_WITH_4_IMAGES:
-                viewHolder = new TweetWithFourImagesViewHolder(inflater.inflate(R.layout.tweet_with_4_images, viewGroup, false), this.mContext);
-                break;
             case VIEW_WITH_4PLUS_IMAGES:
                 viewHolder = new TweetWithFourPlusImagesViewHolder(inflater.inflate(R.layout.tweet_with_4plus_images, viewGroup, false), this.mContext);
                 break;
@@ -128,8 +123,9 @@ public class TweetsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
         int numberOfMedias = 0;
 
-        if (tweet.medias() != null) {
-            numberOfMedias = tweet.medias().size();
+        if (tweet.getTwitterMedias() != null) {
+            Log.d("DEBUG", "Media size:"+tweet.getUid()+ ":"+tweet.getTwitterMedias().size());
+            numberOfMedias = tweet.getTwitterMedias().size();
         }
 
         if (numberOfMedias == 1) {
@@ -138,9 +134,7 @@ public class TweetsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             return VIEW_WITH_2_IMAGES;
         } else if (numberOfMedias == 3){
             return VIEW_WITH_3_IMAGES;
-        } else if (numberOfMedias == 4) {
-            return VIEW_WITH_4_IMAGES;
-        } else if (numberOfMedias > 4) {
+        } else if (numberOfMedias >= 4) {
             return VIEW_WITH_4PLUS_IMAGES;
         }
 

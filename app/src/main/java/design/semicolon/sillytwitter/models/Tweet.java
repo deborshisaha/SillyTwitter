@@ -26,7 +26,11 @@ import design.semicolon.sillytwitter.helpers.DateHelper;
 @Table(name = "Tweet")
 public class Tweet extends Model implements Serializable {
 
-    @Column(name = "user", index = true, onUpdate = Column.ForeignKeyAction.CASCADE)
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    @Column(name = "user", index = true)
     private User user;
 
     @Column(name = "text")
@@ -56,6 +60,15 @@ public class Tweet extends Model implements Serializable {
         return user;
     }
 
+    public List<TwitterMedia> getTwitterMedias() {
+        if (twitterMedias == null){
+            twitterMedias= new ArrayList<TwitterMedia>();
+            twitterMedias.addAll(getMany(TwitterMedia.class, "Tweet"));
+        }
+
+        return twitterMedias;
+    }
+
     public String getText() {
         return text;
     }
@@ -78,9 +91,6 @@ public class Tweet extends Model implements Serializable {
 
         try {
             tweet.user = User.fromJSON(tweetObject.getJSONObject("user"));
-            if (tweet.user == null) {
-                Log.d("DEBUG", "User is null!!!");
-            }
             tweet.text = tweetObject.getString("text");
             tweet.uid = tweetObject.getLong("id");
             tweet.uidStr = tweetObject.getString("id_str");
@@ -120,6 +130,7 @@ public class Tweet extends Model implements Serializable {
 
         if (twitterMedias == null) {return;}
 
+        Log.d("DEBUG", "While saving Media size:" + this.getUid() + ":" + twitterMedias.size());
         for (TwitterMedia media: twitterMedias) {
             media.save();
         }
@@ -127,10 +138,6 @@ public class Tweet extends Model implements Serializable {
 
     public static List<Tweet> all() {
         return new Select().from(Tweet.class).orderBy("timestamp DESC").execute();
-    }
-
-    public List<TwitterMedia> medias() {
-        return this.twitterMedias;
     }
 
     public String getFavoriteCount() {

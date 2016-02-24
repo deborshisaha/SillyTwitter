@@ -29,7 +29,7 @@ public class User extends Model implements Serializable {
     @Column(name = "profile_image_url")
     private String userProfilePictureURLString;
 
-    @Column(name = "uid", unique = true, index = true, onUniqueConflict = Column.ConflictAction.REPLACE)
+    @Column(name = "uid", unique = true, onUniqueConflict = Column.ConflictAction.REPLACE)
     private long uid; // Unique id of the user
 
     public static void setCurrentUser(Context context, JSONObject jsonObject){
@@ -54,6 +54,17 @@ public class User extends Model implements Serializable {
         this.userProfilePictureURLString = ppURL;
     }
 
+    public User saveIfNecessaryElseGetUser() {
+        long rId = this.uid;
+        User existingUser = new Select().from(User.class).where("uid = ?", rId).executeSingle();
+        if (existingUser != null) {
+            return existingUser;
+        } else {
+            this.save();
+            return this;
+        }
+    }
+
     public User(){}
 
     public String getFullName() {
@@ -76,7 +87,15 @@ public class User extends Model implements Serializable {
             user.fullName = userObject.getString("name");
             user.screenName = userObject.getString("screen_name");
             user.uid = userObject.getLong("id");
-            user.userProfilePictureURLString = userObject.getString("profile_image_url");
+
+            String s = userObject.getString("profile_image_url");
+            if (s != null){
+                s = s.replace("_normal", "");
+                user.userProfilePictureURLString = s;
+            } else {
+                user.userProfilePictureURLString = null;
+            }
+
         } catch (JSONException e) {
             e.printStackTrace();
         }

@@ -105,7 +105,7 @@ public class TimelineActivity extends AppCompatActivity {
          * Load data on first load
          */
         try {
-            mTweetDaoImpl.fetchTimelineTweets(TimelineActivity.this, 1, 0, mOnTweetsLoadedListener, TweetDao.CachingStrategy.CacheThenNetwork);
+            mTweetDaoImpl.fetchTimelineTweets(TimelineActivity.this, 1, 0, mOnTweetsLoadedListener, TweetDao.CachingStrategy.CacheOnly);
         } catch (NoNetworkConnectionException e) {
             Toast.makeText(TimelineActivity.this, e.getReason() + ' ' + e.getRemedy(), Toast.LENGTH_LONG).show();
         }
@@ -116,8 +116,7 @@ public class TimelineActivity extends AppCompatActivity {
             Toast.makeText(TimelineActivity.this, e.getReason() + ' ' + e.getRemedy(), Toast.LENGTH_LONG).show();
         }
 
-
-        /*
+/*
         mTimelineRecyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -161,7 +160,7 @@ public class TimelineActivity extends AppCompatActivity {
                 }
             }
         });
-        */
+*/
     }
 
     @Override
@@ -186,6 +185,9 @@ public class TimelineActivity extends AppCompatActivity {
             }
             case R.id.menu_profile:{
                 Log.d("DEBUG", "Do something");
+            }
+            case R.id.menu_message:{
+                Log.d("DEBUG", "Write message to friend");
             }
             default:
                 break;
