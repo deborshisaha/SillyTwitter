@@ -16,6 +16,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import design.semicolon.sillytwitter.R;
 import design.semicolon.sillytwitter.models.Tweet;
+import design.semicolon.sillytwitter.models.User;
 
 public class TweetViewHolder extends RecyclerView.ViewHolder {
 
@@ -56,8 +57,16 @@ public class TweetViewHolder extends RecyclerView.ViewHolder {
     }
 
     public void decorateViewWithTweet (Tweet tweet) {
-        this.user_full_name_textview.setText(tweet.getUser().getFullName());
-        this.username_textview.setText("@"+tweet.getUser().getUserName());
+
+        if (tweet == null) { return; }
+
+        User user = tweet.getUser();
+
+        if (user != null){
+            this.user_full_name_textview.setText(user.getFullName());
+            this.username_textview.setText("@"+ user.getUserName());
+        }
+
         this.relative_time_textview.setText(tweet.getCreatedAt(true));
         this.tweet_text_textview.setText(tweet.getText());
         this.retweet_count_textview.setText(tweet.getRetweetCount());

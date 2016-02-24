@@ -66,18 +66,6 @@ public class TimelineActivity extends AppCompatActivity {
 
         ActiveAndroid.setLoggingEnabled(true);
 
-//        if (Tweet.all().size() !=0 ) {
-//            Tweet.deleteAll();
-//        }
-//
-//        if (TwitterMedia.all().size() !=0 ) {
-//            TwitterMedia.deleteAll();
-//        }
-//
-//        if (User.all().size() !=0 ) {
-//            User.deleteAll();
-//        }
-
         // Bundle
         ButterKnife.bind(this);
 
@@ -117,7 +105,7 @@ public class TimelineActivity extends AppCompatActivity {
          * Load data on first load
          */
         try {
-            mTweetDaoImpl.fetchTimelineTweets(TimelineActivity.this, 1, 0, mOnTweetsLoadedListener, TweetDao.CachingStrategy.NetworkOnly);
+            mTweetDaoImpl.fetchTimelineTweets(TimelineActivity.this, 1, 0, mOnTweetsLoadedListener, TweetDao.CachingStrategy.CacheThenNetwork);
         } catch (NoNetworkConnectionException e) {
             Toast.makeText(TimelineActivity.this, e.getReason() + ' ' + e.getRemedy(), Toast.LENGTH_LONG).show();
         }

@@ -20,7 +20,6 @@ public class User extends Model implements Serializable {
 
     private static final String CURRENT_USER = "current_user";
 
-
     @Column(name = "name")
     private String fullName;
 

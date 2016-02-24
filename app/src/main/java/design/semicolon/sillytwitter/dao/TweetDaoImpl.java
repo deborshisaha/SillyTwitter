@@ -181,10 +181,12 @@ public class TweetDaoImpl implements TweetDao {
         try {
             ActiveAndroid.beginTransaction();
             for (Tweet tweet : tweets) {
-                tweet.save();
-                Log.d("DEBUG", tweet.getUser().getFullName());
                 tweet.getUser().save();
                 tweet.persistMedia();
+                tweet.save();
+                if (tweet.getUser()!= null){
+                    Log.d("DEBUG", tweet.getUser().getFullName());
+                }
             }
             ActiveAndroid.setTransactionSuccessful();
         } finally {

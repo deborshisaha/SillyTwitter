@@ -26,8 +26,34 @@ import design.semicolon.sillytwitter.helpers.DateHelper;
 @Table(name = "Tweet")
 public class Tweet extends Model implements Serializable {
 
+    @Column(name = "user", index = true, onUpdate = Column.ForeignKeyAction.CASCADE)
+    private User user;
+
+    @Column(name = "text")
+    private String text;
+
+    @Column(name = "uid", unique = true, index = true, onUniqueConflict = Column.ConflictAction.REPLACE)
+    private long uid;
+
+    @Column(name = "uidStr")
+    private String uidStr;
+
+    @Column(name = "created_at")
+    private String createdAt;
+
+    @Column(name = "timestamp")
+    private long timestamp;
+
+    @Column(name = "retweet_count")
+    private int retweet_count;
+
+    @Column(name = "favorite_count")
+    private int favorite_count;
+
+    private List<TwitterMedia> twitterMedias;
+
     public User getUser() {
-        return load(User.class, this.getId());
+        return user;
     }
 
     public String getText() {
@@ -52,6 +78,9 @@ public class Tweet extends Model implements Serializable {
 
         try {
             tweet.user = User.fromJSON(tweetObject.getJSONObject("user"));
+            if (tweet.user == null) {
+                Log.d("DEBUG", "User is null!!!");
+            }
             tweet.text = tweetObject.getString("text");
             tweet.uid = tweetObject.getLong("id");
             tweet.uidStr = tweetObject.getString("id_str");
@@ -111,32 +140,6 @@ public class Tweet extends Model implements Serializable {
     public String getRetweetCount() {
         return ""+retweet_count;
     }
-
-    private List<TwitterMedia> twitterMedias;
-
-    @Column(name = "user", index = true, onUpdate = Column.ForeignKeyAction.CASCADE)
-    private User user;
-
-    @Column(name = "text")
-    private String text;
-
-    @Column(name = "uid", unique = true, index = true, onUniqueConflict = Column.ConflictAction.REPLACE)
-    private long uid;
-
-    @Column(name = "uidStr")
-    private String uidStr;
-
-    @Column(name = "created_at")
-    private String createdAt;
-
-    @Column(name = "timestamp")
-    private long timestamp;
-
-    @Column(name = "retweet_count")
-    private int retweet_count;
-
-    @Column(name = "favorite_count")
-    private int favorite_count;
 
     public static void deleteAll() {
         new Delete().from(Tweet.class).execute();
