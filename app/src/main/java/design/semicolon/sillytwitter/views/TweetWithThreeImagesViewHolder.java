@@ -30,8 +30,20 @@ public class TweetWithThreeImagesViewHolder extends TweetViewHolder {
 
     public void decorateViewWithTweet (Tweet tweet) {
         super.decorateViewWithTweet(tweet);
-//        Glide.with(context).load(tweet.getFirstImageURL()).placeholder(R.drawable.placeholder).into(image_one_imageview);
-//        Glide.with(context).load(tweet.getSecondImageURL()).placeholder(R.drawable.placeholder).into(image_two_imageview);
-//        Glide.with(context).load(tweet.getFirstImageURL()).placeholder(R.drawable.placeholder).into(image_three_imageview);
+        String tweetMedia1stURLString = tweet.getFirstImageURL();
+        String tweetMedia2ndURLString = tweet.getSecondImageURL();
+        String tweetMedia3rdURLString = tweet.getThirdImageURL();
+
+        if (tweetMedia1stURLString != null){
+            Glide.with(context).load(tweetMedia1stURLString+":medium").placeholder(R.drawable.placeholder_medium).into(image_one_imageview);
+        }
+
+        if (tweetMedia2ndURLString != null){
+            Glide.with(context).load(tweetMedia2ndURLString+":medium").placeholder(R.drawable.placeholder_medium).into(image_two_imageview);
+        }
+
+        if (tweetMedia2ndURLString != null){
+            Glide.with(context).load(tweetMedia3rdURLString+":medium").placeholder(R.drawable.placeholder_medium).into(image_three_imageview);
+        }
     }
 }

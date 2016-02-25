@@ -66,28 +66,53 @@
             android:layout_height="wrap_content"
             android:id="@+id/images_holder"
             android:layout_marginTop="10dp"
-            android:layout_below="@+id/tweet_text_textview">
+            android:clipChildren="true"
+            android:layout_below="@+id/tweet_text_textview"
+            android:background="@drawable/rounded_view">
 
-            <ImageView
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="150dp"
-                android:scaleType="centerCrop"
-                android:adjustViewBounds="true"
-                android:id="@+id/image_one_imageview"/>
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:weightSum="10">
 
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="150dp"
-                android:scaleType="centerCrop"
-                android:adjustViewBounds="true"
-                android:id="@+id/image_two_imageview"/>
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="150dp"
+                    android:scaleType="fitXY"
+                    android:layout_marginRight="1dp"
+                    android:adjustViewBounds="true"
+                    android:layout_weight="5"
+                    android:id="@+id/image_one_imageview"/>
 
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="150dp"
-                android:scaleType="centerCrop"
-                android:adjustViewBounds="true"
-                android:id="@+id/image_three_imageview"/>
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="150dp"
+                    android:layout_marginLeft="1dp"
+                    android:orientation="vertical"
+                    android:weightSum="10"
+                    android:layout_weight="5">
+
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="1dp"
+                        android:scaleType="fitXY"
+                        android:adjustViewBounds="true"
+                        android:layout_weight="5"
+                        android:id="@+id/image_two_imageview"/>
+
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="1dp"
+                        android:scaleType="fitXY"
+                        android:layout_weight="5"
+                        android:adjustViewBounds="true"
+                        android:id="@+id/image_three_imageview"/>
+
+                </LinearLayout>
+            </LinearLayout>
 
         </RelativeLayout>
 

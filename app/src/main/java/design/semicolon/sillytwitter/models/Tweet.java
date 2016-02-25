@@ -26,6 +26,8 @@ import design.semicolon.sillytwitter.helpers.DateHelper;
 @Table(name = "Tweet")
 public class Tweet extends Model implements Serializable {
 
+    private String secondImageURL;
+
     public void setUser(User user) {
         this.user = user;
     }
@@ -91,7 +93,7 @@ public class Tweet extends Model implements Serializable {
 
         try {
             tweet.user = User.fromJSON(tweetObject.getJSONObject("user"));
-            tweet.text = tweetObject.getString("text");
+
             tweet.uid = tweetObject.getLong("id");
             tweet.uidStr = tweetObject.getString("id_str");
             tweet.createdAt = tweetObject.getString("created_at");
@@ -119,6 +121,16 @@ public class Tweet extends Model implements Serializable {
                 Log.d("DEBUG", "No extended entities");
             }
 
+            if (tweet.twitterMedias != null && tweet.twitterMedias.size() > 0) {
+                // Remove the hyperlink in the text
+                String s = tweetObject.getString("text");
+                if (s.length() > 0) {
+                    s = s.replaceAll("https?://\\S+\\s?", "");
+                }
+                tweet.text = s;
+            } else {
+                tweet.text = tweetObject.getString("text");
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -167,5 +179,35 @@ public class Tweet extends Model implements Serializable {
 
     public long getUid() {
         return uid;
+    }
+
+    public String getSecondImageURL() {
+
+        TwitterMedia media = null;
+        if (twitterMedias!= null && twitterMedias.size() > 1) {
+            media = twitterMedias.get(1);
+        }
+
+        return media.getMediaUrl();
+    }
+
+    public String getThirdImageURL() {
+
+        TwitterMedia media = null;
+        if (twitterMedias!= null && twitterMedias.size() > 2) {
+            media = twitterMedias.get(2);
+        }
+
+        return media.getMediaUrl();
+    }
+
+    public String getForthImageURL() {
+
+        TwitterMedia media = null;
+        if (twitterMedias!= null && twitterMedias.size() > 3) {
+            media = twitterMedias.get(3);
+        }
+
+        return media.getMediaUrl();
     }
 }
