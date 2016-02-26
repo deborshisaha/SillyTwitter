@@ -30,7 +30,7 @@ public class LoginActivity extends  OAuthLoginActionBarActivity<SillyTwitterClie
 
     @Override
     public void onLoginSuccess() {
-        Intent timelineActivityIntent = new Intent(this, TimelineActivity.class);
+        Intent timelineActivityIntent = new Intent(this, HomeActivity.class);
         startActivity(timelineActivityIntent);
     }
 

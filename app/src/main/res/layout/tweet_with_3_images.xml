@@ -63,7 +63,7 @@
 
         <RelativeLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="200dp"
             android:id="@+id/images_holder"
             android:layout_marginTop="10dp"
             android:clipChildren="true"
@@ -72,43 +72,47 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:orientation="horizontal"
                 android:weightSum="10">
 
                 <ImageView
                     android:layout_width="wrap_content"
-                    android:layout_height="150dp"
+                    android:layout_height="200dp"
                     android:scaleType="fitXY"
-                    android:layout_marginRight="1dp"
-                    android:adjustViewBounds="true"
+                    android:cropToPadding="true"
                     android:layout_weight="5"
-                    android:id="@+id/image_one_imageview"/>
+                    android:padding="1dp"
+                    android:adjustViewBounds="true"
+                    android:id="@+id/image_one_imageview"
+                    android:background="@drawable/bordered_image"/>
 
                 <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="150dp"
-                    android:layout_marginLeft="1dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="2dp"
                     android:orientation="vertical"
                     android:weightSum="10"
                     android:layout_weight="5">
 
                     <ImageView
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="1dp"
+                        android:layout_marginBottom="2dp"
                         android:scaleType="fitXY"
                         android:adjustViewBounds="true"
                         android:layout_weight="5"
+                        android:background="@drawable/bordered_image"
                         android:id="@+id/image_two_imageview"/>
 
                     <ImageView
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="1dp"
+                        android:layout_marginTop="2dp"
                         android:scaleType="fitXY"
                         android:layout_weight="5"
                         android:adjustViewBounds="true"
+                        android:background="@drawable/bordered_image"
                         android:id="@+id/image_three_imageview"/>
 
                 </LinearLayout>
@@ -173,6 +177,7 @@
 
             <TextView
                 android:layout_width="60dp"
+                android:layout_marginLeft="4dp"
                 android:layout_height="wrap_content"
                 android:id="@+id/favorite_count_textview"
                 android:layout_toRightOf="@+id/favorite_icon"/>

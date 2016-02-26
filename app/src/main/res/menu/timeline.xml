@@ -6,7 +6,7 @@
         android:id="@+id/menu_message"
         app:showAsAction="always"
         android:title="@string/message"
-        android:icon = "@drawable/ic_message" />
+        android:icon = "@drawable/ic_search" />
 
     <item
         android:id="@+id/menu_new_tweet"

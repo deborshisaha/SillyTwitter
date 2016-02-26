@@ -53,4 +53,23 @@ public class SillyTwitterClient extends OAuthBaseClient {
         String apiUrl = getApiUrl("account/verify_credentials.json");
         getClient().get(apiUrl, handler);
     }
+
+    public void getUserMentions(int count, long since_id, long max_id, AsyncHttpResponseHandler handler) {
+        String urlString = getApiUrl("statuses/home_timeline.json");
+        RequestParams params = new RequestParams();
+
+        if (count != 0) {
+            params.put("count", count);
+        }
+
+        if (since_id != 0) {
+            params.put("since_id", since_id+1);
+        }
+
+        if (max_id != 0) {
+            params.put("max_id", max_id - 1);
+        }
+
+        getClient().get(urlString, params, handler);
+    }
 }

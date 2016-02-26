@@ -19,6 +19,7 @@ import java.io.Serializable;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import design.semicolon.sillytwitter.helpers.DateHelper;
@@ -27,10 +28,6 @@ import design.semicolon.sillytwitter.helpers.DateHelper;
 public class Tweet extends Model implements Serializable {
 
     private String secondImageURL;
-
-    public void setUser(User user) {
-        this.user = user;
-    }
 
     @Column(name = "user", index = true)
     private User user;
@@ -55,6 +52,9 @@ public class Tweet extends Model implements Serializable {
 
     @Column(name = "favorite_count")
     private int favorite_count;
+
+    @Column(name = "user_mentioned")
+    private boolean user_mentioned;
 
     private List<TwitterMedia> twitterMedias;
 
@@ -92,8 +92,8 @@ public class Tweet extends Model implements Serializable {
         Tweet tweet = new Tweet();
 
         try {
-            tweet.user = User.fromJSON(tweetObject.getJSONObject("user"));
 
+            tweet.user = User.fromJSON(tweetObject.getJSONObject("user"));
             tweet.uid = tweetObject.getLong("id");
             tweet.uidStr = tweetObject.getString("id_str");
             tweet.createdAt = tweetObject.getString("created_at");
@@ -136,6 +136,31 @@ public class Tweet extends Model implements Serializable {
         }
 
         return tweet;
+    }
+
+    public boolean wasUserMentioned(User user, JSONObject tweetObject) {
+
+        if (tweetObject == null || user == null) {return  false;}
+
+        try {
+            if (tweetObject.optJSONObject("entities") != null) {
+                JSONObject entitiesJSONObject = null;
+
+                entitiesJSONObject = tweetObject.getJSONObject("entities");
+
+                if (entitiesJSONObject.optJSONArray("user_mentions") != null) {
+                    JSONArray mentionsArray = entitiesJSONObject.getJSONArray("user_mentions");
+                    for (int i = 0; i < mentionsArray.length(); i++) {
+                        JSONObject userMentionObject = mentionsArray.getJSONObject(i);
+                        return userMentionObject.getString("screen_name").equals(user.getUserName());
+                    }
+                }
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return false;
     }
 
     public void persistMedia () {
@@ -209,5 +234,28 @@ public class Tweet extends Model implements Serializable {
         }
 
         return media.getMediaUrl();
+    }
+
+    public boolean hasVideo() {
+
+        for (TwitterMedia media: twitterMedias) {
+            if (media.getMediaType() == TwitterMedia.MediaType.MEDIA_TYPE_VIDEO){
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public static List<Tweet> getTweetsUserWasMentioned() {
+        return new Select().from(Tweet.class).where("user_mentioned = ?", true).orderBy("timestamp DESC").executeSingle();
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public void setUserMentioned(boolean um) {
+        this.user_mentioned = um;
     }
 }

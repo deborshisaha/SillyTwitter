@@ -3,9 +3,7 @@ package design.semicolon.sillytwitter.dao;
 import android.content.Context;
 import android.content.res.Resources;
 import android.preference.PreferenceManager;
-import android.util.Log;
 
-import com.activeandroid.ActiveAndroid;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
 import org.apache.http.Header;
@@ -23,67 +21,57 @@ import design.semicolon.sillytwitter.R;
 import design.semicolon.sillytwitter.SillyTwitterApplication;
 import design.semicolon.sillytwitter.exceptions.NoNetworkConnectionException;
 import design.semicolon.sillytwitter.listerners.OnTweetsLoadedListener;
+import design.semicolon.sillytwitter.managers.PersistenceManager;
 import design.semicolon.sillytwitter.managers.NetworkConnectivityManager;
 import design.semicolon.sillytwitter.models.Tweet;
 import design.semicolon.sillytwitter.models.TwitterMedia;
 import design.semicolon.sillytwitter.models.User;
-import design.semicolon.sillytwitter.restclient.SillyTwitterClient;
 
 /**
  * Created by dsaha on 2/20/16.
  */
 public class TweetDaoImpl implements TweetDao {
 
-    private SillyTwitterClient client;
+    // private SillyTwitterClient client;
 
-    private static final String LAST_TWEET_ID = "LAST_TWEET_ID";
+    private static final String OLDEST_TIMELINE_TWEET_ID = "OLDEST_TIMELINE_TWEET_ID";
+    private static final String NEWEST_TIMELINE_TWEET_ID = "NEWEST_TIMELINE_TWEET_ID";
 
-    /**
-     * @param context
-     * @param max_id
-     * @param onTweetsLoadedListener
-     * @param cachingStrategy
-     * @throws NoNetworkConnectionException
-     */
+    private static final String OLDEST_USER_MENTIONED_TWEET_ID = "OLDEST_USER_MENTIONED_TWEET_ID";
+    private static final String NEWEST_USER_MENTIONED_TWEET_ID = "NEWEST_USER_MENTIONED_TWEET_ID";
+
+    private Context mContext;
+
+    public TweetDaoImpl(Context mContext) {
+        super();
+        this.mContext = mContext;
+    }
+
+    public TweetDaoImpl() { super();}
+
     @Override
     public void fetchTimelineTweets(Context context,  long since_id, long max_id, final OnTweetsLoadedListener onTweetsLoadedListener, int cachingStrategy) throws NoNetworkConnectionException {
 
-
+        ///////// Remove this ///////////
         if (CachingStrategy.CacheOnly == cachingStrategy) {
 
             try {
-                String mentionedTweetsString = getStringFromRaw(context, R.raw.deborshisaha_mentions);
+                String mentionedTweetsString = getStringFromRaw(context, R.raw.deborshisaha_user_timeline);
                 JSONArray mentionedTweetsJSONArray = new JSONArray(mentionedTweetsString);
-
-                Log.d("DEBUG", "Number of tweets in the JSONArray : " + mentionedTweetsJSONArray.length());
                 List<Tweet> mentionedTweets = getArrayOfTweetObjects(mentionedTweetsJSONArray, true);
-                Log.d("DEBUG", "Number of tweets in mentionedTweets : " + mentionedTweets.size());
-
-                Log.d("DEBUG", "Number of tweets in DB BEFORE persistence : " + Tweet.all().size());
-                Log.d("DEBUG", "Number of TwitterMedia in DB BEFORE Tweet persistence : " + TwitterMedia.all().size());
-                persistTweets(mentionedTweets);
-                Log.d("DEBUG", "Number of tweets in DB AFTER persistence : " + Tweet.all().size());
-                Log.d("DEBUG", "Number of TwitterMedia in DB AFTER Tweet persistence : " + TwitterMedia.all().size());
-
-                Log.d("DEBUG", "Finish");
+                PersistenceManager.persistTweets(mentionedTweets);
                 onTweetsLoadedListener.onTweetsLoaded(Tweet.all(), false);
-            }
-            catch(Throwable t) {
+
+            } catch(Throwable t) {
                 t.printStackTrace();
             }
 
             return;
         }
+        ///////// Remove this ///////////
 
-        int count = 0;
-
-        // Check what the network strategy is
-        if (cachingStrategy == CachingStrategy.CacheOnly || cachingStrategy == CachingStrategy.CacheThenNetwork) {
-            //List<Tweet> list = Tweet.all();
-            onTweetsLoadedListener.onTweetsLoaded(Tweet.all(), true);
-        }
-
-        if (cachingStrategy == CachingStrategy.CacheOnly) {
+        // Return true then fetch
+        if (PersistenceManager.fetchCachedTimelineTweets(cachingStrategy, onTweetsLoadedListener)) {
             return;
         }
 
@@ -92,40 +80,82 @@ public class TweetDaoImpl implements TweetDao {
             throw new NoNetworkConnectionException();
         }
 
-        /**
-         * To modify throttling
-         */
-        if (NetworkConnectivityManager.isConnectedToInternetViaWifi(context)) {
-            count = 20;
-        } else {
-            count = 10;
-        }
-
-        if (client == null) {
-            client = SillyTwitterApplication.getRestClient();
-        }
-
         // Get timeline
-        client.getHomeTimeLine(count, since_id, max_id, new JsonHttpResponseHandler(){
+        SillyTwitterApplication.getRestClient().getHomeTimeLine(getFetchCount(context), since_id, max_id, new JsonHttpResponseHandler() {
 
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONArray json) {
                 super.onSuccess(statusCode, headers, json);
-
-//                List<Tweet> timelineTweets = getArrayOfTweetObjects(json, false);
-//                List<Tweet> savedTweets = Tweet.all();
-//                if (savedTweets.size() != processedTweets.size()) {
-//                    Log.e("ERROR", "Not all tweets were saved");
-//                }
-//                Log.d("DEBUG", "Number of tweets in the JSONArray : " + json.length());
                 List<Tweet> mentionedTweets = getArrayOfTweetObjects(json, true);
-//                Log.d("DEBUG", "Number of tweets in mentionedTweets : " + mentionedTweets.size());
-//                Log.d("DEBUG", "Number of tweets in DB BEFORE persistence : " + Tweet.all().size());
-//                Log.d("DEBUG", "Number of TwitterMedia in DB BEFORE Tweet persistence : " + TwitterMedia.all().size());
-                Log.d("DEBUG", "Number of Users in DB BEFORE Tweet persistence : " + User.all().size());
-                persistTweets(mentionedTweets);
-                Log.d("DEBUG", "Number of Users in DB BEFORE Tweet persistence : " + User.all().size());
+                PersistenceManager.persistTweets(mentionedTweets);
                 onTweetsLoadedListener.onTweetsLoaded(Tweet.all(), false);
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                super.onFailure(statusCode, headers, throwable, errorResponse);
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
+                super.onFailure(statusCode, headers, throwable, errorResponse);
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                super.onFailure(statusCode, headers, responseString, throwable);
+            }
+
+        });
+    }
+
+    @Override
+    public void fetchMentions( Context context, final OnTweetsLoadedListener onTweetsLoadedListener, int cachingStrategy) throws NoNetworkConnectionException {
+        ///////// Remove this ///////////
+        if (CachingStrategy.CacheOnly == cachingStrategy) {
+
+            try {
+
+                Tweet.deleteAll();
+                User.deleteAll();
+                TwitterMedia.deleteAll();
+                String mentionedTweetsString = getStringFromRaw(context, R.raw.deborshisaha_mentions);
+
+                JSONArray mentionedTweetsJSONArray = new JSONArray(mentionedTweetsString);
+                List<Tweet> mentionedTweets = getArrayOfTweetObjects(mentionedTweetsJSONArray, true);
+
+                PersistenceManager.persistTweets(mentionedTweets);
+                onTweetsLoadedListener.onTweetsLoaded(Tweet.getTweetsUserWasMentioned(), false);
+            } catch(Throwable t) {
+                t.printStackTrace();
+            }
+
+            return;
+        }
+        ///////// Remove this ///////////
+
+        // Return true then fetch
+        if (PersistenceManager.fetchUserMentionedTweets(cachingStrategy, onTweetsLoadedListener)) {
+            return;
+        }
+
+        // if we need to connect to network, check if connected to internet
+        if ( !NetworkConnectivityManager.isConnectedToInternet(context)) {
+            throw new NoNetworkConnectionException();
+        }
+
+        long oldestTweetUserWasMentioned = getOldestTweetInUserMentionFetchedId(context);
+        long newestTweetUserWasMentioned = getNewestTweetInUserMentionFetchedId(context);
+
+        // Get User mentions
+        SillyTwitterApplication.getRestClient().getUserMentions(getFetchCount(context), newestTweetUserWasMentioned, oldestTweetUserWasMentioned, new JsonHttpResponseHandler() {
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONArray json) {
+                super.onSuccess(statusCode, headers, json);
+                List<Tweet> mentionedTweets = getArrayOfTweetObjects(json, true);
+                PersistenceManager.persistTweets(mentionedTweets);
+                onTweetsLoadedListener.onTweetsLoaded(Tweet.getTweetsUserWasMentioned(), false);
             }
 
             @Override
@@ -155,6 +185,13 @@ public class TweetDaoImpl implements TweetDao {
                 for (int i = 0; i < tweetsJSONArray.length(); i++) {
                     JSONObject tweetJSONObject = tweetsJSONArray.getJSONObject(i);
                     Tweet tweet = Tweet.fromJSON(tweetJSONObject);
+
+                    if (tweet.wasUserMentioned(User.currentUser(mContext), tweetJSONObject)) {
+                        tweet.setUserMentioned(true);
+                    } else {
+                        tweet.setUserMentioned(false);
+                    }
+
                     if (tweet != null) {
                         tweets.add(tweet);
                     }
@@ -166,40 +203,64 @@ public class TweetDaoImpl implements TweetDao {
         return tweets;
     }
 
-    private static long getNewestFetchedId(Context context) {
-        return PreferenceManager.getDefaultSharedPreferences(context).getLong(LAST_TWEET_ID, 0);
+    private static long getNewestTweetInTimeLineFetchedId(Context context) {
+        return PreferenceManager.getDefaultSharedPreferences(context).getLong(NEWEST_TIMELINE_TWEET_ID, 0);
     }
 
-    private static void setNewestFetchedId(Context context, long id) {
-        PreferenceManager.getDefaultSharedPreferences(context).edit().putLong(LAST_TWEET_ID, id).apply();
+    private static void setNewestTweetInTimeLineFetchedId(Context context, long id) {
+        PreferenceManager.getDefaultSharedPreferences(context).edit().putLong(NEWEST_TIMELINE_TWEET_ID, id).apply();
     }
 
-    /**
-     * Persist all contents of the tweet
-     */
-    private void persistTweets (List<Tweet> tweets) {
-        try {
-            ActiveAndroid.beginTransaction();
-            for (Tweet tweet : tweets) {
-
-                User user = tweet.getUser();
-
-                if (user != null){
-                    tweet.setUser(user.saveIfNecessaryElseGetUser());
-                }
-
-                tweet.save();
-                tweet.persistMedia();
-
-                if (tweet.getUser()!= null){
-                    Log.d("DEBUG", tweet.getUser().getFullName());
-                }
-            }
-            ActiveAndroid.setTransactionSuccessful();
-        } finally {
-            ActiveAndroid.endTransaction();
-        }
+    private static long getOldestTweetInTimeLineFetchedId(Context context) {
+        return PreferenceManager.getDefaultSharedPreferences(context).getLong(OLDEST_TIMELINE_TWEET_ID, 0);
     }
+
+    private static void setOldestTweetInTimeLineFetchedId(Context context, long id) {
+        PreferenceManager.getDefaultSharedPreferences(context).edit().putLong(OLDEST_TIMELINE_TWEET_ID, id).apply();
+    }
+
+    private static long getNewestTweetInUserMentionFetchedId(Context context) {
+        return PreferenceManager.getDefaultSharedPreferences(context).getLong(NEWEST_USER_MENTIONED_TWEET_ID, 0);
+    }
+
+    private static void setNewestTweetInUserMentionFetchedId(Context context, long id) {
+        PreferenceManager.getDefaultSharedPreferences(context).edit().putLong(NEWEST_USER_MENTIONED_TWEET_ID, id).apply();
+    }
+
+    private static long getOldestTweetInUserMentionFetchedId(Context context) {
+        return PreferenceManager.getDefaultSharedPreferences(context).getLong(OLDEST_USER_MENTIONED_TWEET_ID, 0);
+    }
+
+    private static void setOldestTweetInUserMentionFetchedId(Context context, long id) {
+        PreferenceManager.getDefaultSharedPreferences(context).edit().putLong(OLDEST_USER_MENTIONED_TWEET_ID, id).apply();
+    }
+
+//    /**
+//     * Persist all contents of the tweet
+//     */
+//    private void persistTweets (List<Tweet> tweets) {
+//        try {
+//            ActiveAndroid.beginTransaction();
+//            for (Tweet tweet : tweets) {
+//
+//                User user = tweet.getUser();
+//
+//                if (user != null){
+//                    tweet.setUser(user.saveIfNecessaryElseGetUser());
+//                }
+//
+//                tweet.save();
+//                tweet.persistMedia();
+//
+//                if (tweet.getUser()!= null){
+//                    Log.d("DEBUG", tweet.getUser().getFullName());
+//                }
+//            }
+//            ActiveAndroid.setTransactionSuccessful();
+//        } finally {
+//            ActiveAndroid.endTransaction();
+//        }
+//    }
 
     /**
      * Read from file
@@ -220,5 +281,14 @@ public class TweetDaoImpl implements TweetDao {
             i = is.read();
         }
         return baos.toString();
+    }
+
+    private int getFetchCount(Context context) {
+
+        if (NetworkConnectivityManager.isConnectedToInternetViaWifi(context)) {
+            return 20;
+        } else {
+            return 10;
+        }
     }
 }

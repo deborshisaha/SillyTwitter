@@ -63,38 +63,76 @@
 
         <RelativeLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="204dp"
             android:id="@+id/images_holder"
             android:layout_marginTop="10dp"
+            android:weightSum="10"
             android:layout_below="@+id/tweet_text_textview">
 
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="150dp"
-                android:scaleType="centerCrop"
-                android:adjustViewBounds="true"
-                android:id="@+id/image_one_imageview"/>
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:id="@+id/horizontal_1"
+                android:padding="1dp"
+                android:weightSum="10"
+                android:layout_weight="5">
 
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="150dp"
-                android:scaleType="centerCrop"
-                android:adjustViewBounds="true"
-                android:id="@+id/image_two_imageview"/>
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="100dp"
+                    android:scaleType="fitXY"
+                    android:cropToPadding="true"
+                    android:layout_weight="5"
+                    android:padding="1dp"
+                    android:adjustViewBounds="true"
+                    android:id="@+id/image_one_imageview"
+                    android:background="@drawable/bordered_image"/>
 
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="150dp"
-                android:scaleType="centerCrop"
-                android:adjustViewBounds="true"
-                android:id="@+id/image_three_imageview"/>
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="100dp"
+                    android:scaleType="fitXY"
+                    android:cropToPadding="true"
+                    android:adjustViewBounds="true"
+                    android:padding="1dp"
+                    android:layout_marginLeft="2dp"
+                    android:layout_weight="5"
+                    android:background="@drawable/bordered_image"
+                    android:id="@+id/image_two_imageview"/>
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_below="@+id/horizontal_1"
+                android:padding="1dp"
+                android:weightSum="10"
+                android:layout_weight="5">
 
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="150dp"
-                android:scaleType="centerCrop"
-                android:adjustViewBounds="true"
-                android:id="@+id/image_four_imageview"/>
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="100dp"
+                    android:scaleType="fitXY"
+                    android:cropToPadding="true"
+                    android:layout_weight="5"
+                    android:padding="1dp"
+                    android:adjustViewBounds="true"
+                    android:id="@+id/image_three_imageview"
+                    android:background="@drawable/bordered_image"/>
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="100dp"
+                    android:scaleType="fitXY"
+                    android:cropToPadding="true"
+                    android:adjustViewBounds="true"
+                    android:padding="1dp"
+                    android:layout_marginLeft="2dp"
+                    android:layout_weight="5"
+                    android:background="@drawable/bordered_image"
+                    android:id="@+id/image_four_imageview"/>
+            </LinearLayout>
 
         </RelativeLayout>
 
@@ -135,6 +173,7 @@
             <TextView
                 android:layout_width="60dp"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="2dp"
                 android:id="@+id/retweet_count_textview"
                 android:layout_toRightOf="@+id/retweet_icon"/>
 
@@ -150,11 +189,13 @@
             <ImageView
                 android:layout_width="22dp"
                 android:layout_height="22dp"
+                android:layout_marginRight="2dp"
                 android:src="@drawable/ic_fav_grey"
                 android:id="@+id/favorite_icon"/>
 
             <TextView
                 android:layout_width="60dp"
+                android:layout_marginLeft="2dp"
                 android:layout_height="wrap_content"
                 android:id="@+id/favorite_count_textview"
                 android:layout_toRightOf="@+id/favorite_icon"/>

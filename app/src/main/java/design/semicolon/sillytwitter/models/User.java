@@ -36,12 +36,17 @@ public class User extends Model implements Serializable {
         PreferenceManager.getDefaultSharedPreferences(context).edit().putString(CURRENT_USER, jsonObject.toString()).apply();
     }
 
-    public static User currentUser(Context context) throws JSONException {
+    public static User currentUser(Context context) {
 
         String userJsonString = PreferenceManager.getDefaultSharedPreferences(context).getString(CURRENT_USER, null);
 
         if (userJsonString != null || userJsonString.length() != 0){
-            JSONObject jsonObject = new JSONObject(userJsonString);
+            JSONObject jsonObject = null;
+            try {
+                jsonObject = new JSONObject(userJsonString);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
             return User.fromJSON(jsonObject);
         } else {
             return null;

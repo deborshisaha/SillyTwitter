@@ -18,6 +18,7 @@ android {
         }
     }
     repositories {
+        jcenter()
         mavenCentral()
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
     }
@@ -50,4 +51,11 @@ dependencies {
     /* Glide */
     compile 'com.github.bumptech.glide:glide:3.5.2'
     compile 'com.android.support:support-v4:22.0.0'
+
+    /* Video player manager */
+    compile 'com.github.danylovolokh:video-player-manager:0.2.0'
+    compile 'com.github.danylovolokh:list-visibility-utils:0.2.0'
+
+    /* Pager tab */
+    compile 'com.astuetz:pagerslidingtabstrip:1.0.1'
 }

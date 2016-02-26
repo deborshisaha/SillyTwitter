@@ -9,6 +9,7 @@ import com.activeandroid.annotation.Table;
 import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -18,14 +19,28 @@ import java.util.List;
 @Table(name = "TwitterMedia")
 public class TwitterMedia extends Model implements Serializable {
 
+    private MediaType mediaType;
+
     @Column(name = "meadia_id", unique = true, index = true, onUniqueConflict = Column.ConflictAction.REPLACE)
     private long imgId;
 
     @Column(name = "media_url")
     private String mediaUrl;
 
+    @Column(name = "type")
+    private String type;
+
     @Column(name = "Tweet")
     private Tweet tweet;
+
+    @Column(name = "video_duration")
+    private int videoDuration;
+
+    @Column(name = "low_bitrate_media_url")
+    private String lowBitrateMediaURL;
+
+    @Column(name = "high_bitrate_media_url")
+    private String highBitrateMediaURL;
 
     public Tweet getTweet() {
         return tweet;
@@ -42,12 +57,64 @@ public class TwitterMedia extends Model implements Serializable {
         try {
             media.imgId = twitterMediaObject.getLong("id");;
             media.mediaUrl = twitterMediaObject.getString("media_url");
+            media.type = twitterMediaObject.getString("type");
+
+            if (media.type.equals("video")) {
+                media.mediaType = MediaType.MEDIA_TYPE_VIDEO;
+            } else if (media.type.equals("image")) {
+                media.mediaType = MediaType.MEDIA_TYPE_IMAGE;
+            } else {
+                media.mediaType = MediaType.MEDIA_TYPE_UNKNOWN;
+            }
+
             media.tweet = tweet;
+
+            if (media.mediaType == MediaType.MEDIA_TYPE_VIDEO) {
+                extractVideoInformation(media, twitterMediaObject.getJSONObject("video_info"));
+            }
+
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
         return media;
+    }
+
+    private static void extractVideoInformation(TwitterMedia media, JSONObject mediaVideoObject) {
+        int maxBitRate = Integer.MIN_VALUE;
+        int minBitRate = Integer.MAX_VALUE;
+
+        try {
+
+            if (mediaVideoObject.optJSONArray("variants") != null) {
+                JSONArray arrayOfVariants = mediaVideoObject.getJSONArray("variants");
+                for (int i = 0; i < arrayOfVariants.length() ; i++) {
+                    JSONObject variantObject = (JSONObject)arrayOfVariants.get(i);
+
+                    if (variantObject.optDouble("bitrate") != 0) {
+                        maxBitRate = Math.max(maxBitRate,variantObject.getInt("bitrate"));
+                        minBitRate = Math.min(minBitRate, variantObject.getInt("bitrate"));
+                    }
+                }
+
+                for (int i = 0; i < arrayOfVariants.length() ; i++) {
+                    JSONObject variantObject = (JSONObject)arrayOfVariants.get(i);
+
+                    if (variantObject.optDouble("bitrate") != 0) {
+                        int br = variantObject.getInt("bitrate");
+
+                        if (br == minBitRate ) {
+                            media.lowBitrateMediaURL = variantObject.getString("url");
+                        } else if (br == maxBitRate) {
+                            media.highBitrateMediaURL = variantObject.getString("url");
+                        }
+                    }
+                }
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     public static List<TwitterMedia> all() {
@@ -56,6 +123,36 @@ public class TwitterMedia extends Model implements Serializable {
 
     public static void deleteAll() {
         new Delete().from(TwitterMedia.class).execute();
+    }
+
+    public enum MediaType {
+        MEDIA_TYPE_VIDEO,
+        MEDIA_TYPE_IMAGE,
+        MEDIA_TYPE_UNKNOWN
+    }
+
+    public MediaType getMediaType() {
+
+        if (mediaType == MediaType.MEDIA_TYPE_UNKNOWN) {
+            if (type.equals("video")) {
+                mediaType = MediaType.MEDIA_TYPE_VIDEO;
+            } else if (type.equals("photo")){
+                mediaType = MediaType.MEDIA_TYPE_IMAGE;
+            }
+        }
+        return mediaType;
+    }
+
+    public String getHighBitrateMediaURL() {
+        return highBitrateMediaURL;
+    }
+
+    public String getLowBitrateMediaURL() {
+        return lowBitrateMediaURL;
+    }
+
+    public int getVideoDuration() {
+        return videoDuration;
     }
 
 //    @Override
@@ -72,6 +169,7 @@ public class TwitterMedia extends Model implements Serializable {
 //
     public TwitterMedia() {
         super();
+        this.mediaType = MediaType.MEDIA_TYPE_UNKNOWN;
     }
 //
 //    protected TwitterMedia(Parcel in) {
@@ -90,3 +188,5 @@ public class TwitterMedia extends Model implements Serializable {
 //        }
 //    };
 }
+
+

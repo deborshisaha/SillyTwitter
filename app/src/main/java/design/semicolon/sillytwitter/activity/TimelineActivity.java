@@ -1,27 +1,21 @@
 package design.semicolon.sillytwitter.activity;
 
-import android.content.Context;
-import android.content.Intent;
+import android.support.v7.app.ActionBar;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Toast;
 
 import com.activeandroid.ActiveAndroid;
-import com.loopj.android.http.JsonHttpResponseHandler;
 
-import org.apache.http.Header;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.List;
 
@@ -37,7 +31,6 @@ import design.semicolon.sillytwitter.fragments.ComposeNewTweetFragment;
 import design.semicolon.sillytwitter.listerners.OnTweetsLoadedListener;
 import design.semicolon.sillytwitter.listerners.OnUsersLoadedListener;
 import design.semicolon.sillytwitter.models.Tweet;
-import design.semicolon.sillytwitter.models.TwitterMedia;
 import design.semicolon.sillytwitter.models.User;
 
 public class TimelineActivity extends AppCompatActivity {
@@ -57,14 +50,31 @@ public class TimelineActivity extends AppCompatActivity {
     private LinearLayoutManager mLinearLayoutManager;
 
     private boolean loading = true;
-    private int firstVisibleItem, visibleItemCount, totalItemCount;
+    private int firstVisibleItem, visibleItemCount, totalItemCount, lastVisibleItem;
+    private int lastVideoPlayingIndex = -1;
 
+
+    /*
+    private ListItemsVisibilityCalculator mListItemVisibilityCalculator = null;
+    private RecyclerViewItemPositionGetter mItemsPositionGetter = null;
+    private int mScrollState = AbsListView.OnScrollListener.SCROLL_STATE_IDLE;
+    private final VideoPlayerManager<MetaData> mVideoPlayerManager = new SingleVideoPlayerManager(new PlayerItemChangeListener() {
+        @Override
+        public void onPlayerItemChanged(MetaData metaData) {
+
+        }
+    });
+    */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_timeline);
 
         ActiveAndroid.setLoggingEnabled(true);
+
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setLogo(R.mipmap.ic_action_logo);
+        getSupportActionBar().setDisplayUseLogoEnabled(true);
 
         // Bundle
         ButterKnife.bind(this);
@@ -116,17 +126,90 @@ public class TimelineActivity extends AppCompatActivity {
             Toast.makeText(TimelineActivity.this, e.getReason() + ' ' + e.getRemedy(), Toast.LENGTH_LONG).show();
         }
 
-/*
-        mTimelineRecyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
+        /*
+        if (mListItemVisibilityCalculator == null) {
+            mListItemVisibilityCalculator =
+                    new SingleListViewItemActiveCalculator(new DefaultSingleItemCalculatorCallback(), (List<? extends ListItem>) mTweetAdapter);
+        }
+
+        if (mItemsPositionGetter == null) {
+            mItemsPositionGetter = new RecyclerViewItemPositionGetter(mLinearLayoutManager, mTimelineRecyclerView);
+        }
+        */
+
+        mTimelineRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int scrollState) {
+                super.onScrollStateChanged(recyclerView, scrollState);
+                /*
+                mScrollState = scrollState;
+                if(scrollState == RecyclerView.SCROLL_STATE_IDLE && !mTweetAdapter.isEmpty()){
+
+                    mListItemVisibilityCalculator.onScrollStateIdle(
+                            mItemsPositionGetter,
+                            mLinearLayoutManager.findFirstVisibleItemPosition(),
+                            mLinearLayoutManager.findLastVisibleItemPosition());
+                }*/
+            }
+
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                /*
+                if(!mTweetAdapter.isEmpty()){
+                    mListItemVisibilityCalculator.onScroll(
+                            mItemsPositionGetter,
+                            mLinearLayoutManager.findFirstVisibleItemPosition(),
+                            mLinearLayoutManager.findLastVisibleItemPosition() - mLinearLayoutManager.findFirstVisibleItemPosition() + 1,
+                            mScrollState);
+                }
+                */
+
+                visibleItemCount = recyclerView.getChildCount();
+                totalItemCount = mLinearLayoutManager.getItemCount();
+                firstVisibleItem = mLinearLayoutManager.findFirstVisibleItemPosition();
+                lastVisibleItem = mLinearLayoutManager.findLastVisibleItemPosition();
+
                 if (dy > 0) {
 
-                    visibleItemCount = recyclerView.getChildCount();
-                    totalItemCount = mLinearLayoutManager.getItemCount();
-                    firstVisibleItem = mLinearLayoutManager.findFirstVisibleItemPosition();
+                    if (!loading && ((visibleItemCount + firstVisibleItem) * 100 / totalItemCount) > 90) {
+                        loading = true;
 
-                    Log.d("DEBUG", "visibleItemCount: "+visibleItemCount+" totalItemCount: "+totalItemCount+" firstVisibleItem: "+firstVisibleItem);
+                        Tweet tweet = mTweetAdapter.getLastTweet();
+
+                        if (tweet != null) {
+                            long max_id = tweet.getUid();
+
+                            try {
+                                mTweetDaoImpl.fetchTimelineTweets(TimelineActivity.this, 0, max_id, mOnTweetsLoadedListener, TweetDao.CachingStrategy.CacheOnly);
+                            } catch (NoNetworkConnectionException e) {
+                                Toast.makeText(TimelineActivity.this, e.getReason() + ' ' + e.getRemedy(), Toast.LENGTH_LONG).show();
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        /*
+        mTimelineRecyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
+
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+
+                // IF scrolling down
+                visibleItemCount = recyclerView.getChildCount();
+                totalItemCount = mLinearLayoutManager.getItemCount();
+                firstVisibleItem = mLinearLayoutManager.findFirstVisibleItemPosition();
+                lastVisibleItem = mLinearLayoutManager.findLastVisibleItemPosition();
+
+                Log.d("DEBUG", "visibleItemCount :"+visibleItemCount);
+                Log.d("DEBUG", "firstVisibleItem :"+firstVisibleItem);
+                Log.d("DEBUG", "firstCompletelyVisibleItem :"+ mLinearLayoutManager.findFirstCompletelyVisibleItemPosition());
+
+                Log.d("DEBUG", "dx :"+ dx + "dy :" + dy);
+
+                if (dy > 0) {
 
                     if (!loading && ((visibleItemCount + firstVisibleItem)*100/totalItemCount) > 90) {
                         loading = true;
@@ -211,4 +294,32 @@ public class TimelineActivity extends AppCompatActivity {
         frag.show(fm, "compose_new_tweet_fragment");
     }
 
+    /*
+    @Override
+    public void onResume() {
+        super.onResume();
+        if(!mTweetAdapter.isEmpty()){
+            // need to call this method from list view handler in order to have filled list
+
+            mTimelineRecyclerView.post(new Runnable() {
+                @Override
+                public void run() {
+
+                    mListItemVisibilityCalculator.onScrollStateIdle(
+                            mItemsPositionGetter,
+                            mLinearLayoutManager.findFirstVisibleItemPosition(),
+                            mLinearLayoutManager.findLastVisibleItemPosition());
+
+                }
+            });
+        }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        // we have to stop any playback in onStop
+        mVideoPlayerManager.resetMediaPlayer();
+    }
+    */
 }

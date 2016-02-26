@@ -4,7 +4,10 @@ import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
+
+import com.volokh.danylo.visibility_utils.items.ListItem;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,6 +16,7 @@ import java.util.List;
 import design.semicolon.sillytwitter.R;
 import design.semicolon.sillytwitter.activity.TimelineActivity;
 import design.semicolon.sillytwitter.models.Tweet;
+import design.semicolon.sillytwitter.views.TweetVideoViewHolder;
 import design.semicolon.sillytwitter.views.TweetViewHolder;
 import design.semicolon.sillytwitter.views.TweetWithFourPlusImagesViewHolder;
 import design.semicolon.sillytwitter.views.TweetWithOneImageViewHolder;
@@ -27,14 +31,16 @@ public class TweetsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     public final int VIEW_WITH_3_IMAGES = VIEW_WITH_1_IMAGE << 2;
     public final int VIEW_WITH_4_IMAGES = VIEW_WITH_1_IMAGE << 3;
     public final int VIEW_WITH_4PLUS_IMAGES = VIEW_WITH_1_IMAGE << 4;
+    public final int VIEW_WITH_VIDEO = VIEW_WITH_1_IMAGE << 5;
 
     private HashMap<String,Boolean> mTweetInRecyclerViewMap = new HashMap<String,Boolean>();
 
     private List<Tweet> mTweets;
     Context mContext;
+    private boolean empty;
 
-    public TweetsAdapter(TimelineActivity timelineActivity) {
-        this.mContext = timelineActivity;
+    public TweetsAdapter(Context context) {
+        this.mContext = context;
     }
 
     public void addTweets(List<Tweet> tweets) {
@@ -89,6 +95,9 @@ public class TweetsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             case VIEW_WITH_4PLUS_IMAGES:
                 viewHolder = new TweetWithFourPlusImagesViewHolder(inflater.inflate(R.layout.tweet_with_4plus_images, viewGroup, false), this.mContext);
                 break;
+            case VIEW_WITH_VIDEO:
+                viewHolder = new TweetVideoViewHolder(inflater.inflate(R.layout.tweet_with_video, viewGroup, false), this.mContext);
+                break;
             default:
                 viewHolder = new TweetViewHolder(inflater.inflate(R.layout.tweet_with_no_images, viewGroup, false), this.mContext);
                 break;
@@ -128,7 +137,9 @@ public class TweetsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             numberOfMedias = tweet.getTwitterMedias().size();
         }
 
-        if (numberOfMedias == 1) {
+        if (numberOfMedias > 0 && tweet.hasVideo()) {
+            return VIEW_WITH_VIDEO;
+        } else if (numberOfMedias == 1) {
             return VIEW_WITH_1_IMAGE;
         } else if (numberOfMedias == 2){
             return VIEW_WITH_2_IMAGES;
@@ -159,6 +170,15 @@ public class TweetsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         if (mTweets.size() != 0) {
             return mTweets.get(mTweets.size() - 1);
         }
+        return null;
+    }
+
+    public Tweet getTweetAtPosition(int position) {
+
+        if (position < mTweets.size()) {
+            return mTweets.get(position);
+        }
+
         return null;
     }
 }
