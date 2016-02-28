@@ -9,6 +9,7 @@ import com.bumptech.glide.Glide;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import design.semicolon.sillytwitter.R;
+import design.semicolon.sillytwitter.listerners.TweetViewHolderEventListener;
 import design.semicolon.sillytwitter.models.Tweet;
 
 public class TweetWithThreeImagesViewHolder extends TweetViewHolder {
@@ -22,8 +23,8 @@ public class TweetWithThreeImagesViewHolder extends TweetViewHolder {
     @Bind(R.id.image_three_imageview)
     ImageView image_three_imageview;
 
-    public TweetWithThreeImagesViewHolder(View itemView, Context context){
-        super(itemView, context);
+    public TweetWithThreeImagesViewHolder(View itemView, Context context, TweetViewHolderEventListener tweetViewHolderEventListener){
+        super(itemView, context, tweetViewHolderEventListener);
 
         ButterKnife.bind(this, itemView);
     }

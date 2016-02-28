@@ -49,6 +49,9 @@
         </activity>
         <activity android:name=".activity.TimelineActivity" > </activity>
         <activity android:name=".activity.HomeActivity" > </activity>
+        <activity android:name=".activity.TweetDetailedActivity" android:theme="@style/AppTheme"> </activity>
+        <activity android:name=".activity.UserProfileActivity"
+            android:theme="@style/AppTheme.NoActionBar"> </activity>
     </application>
 
 </manifest>

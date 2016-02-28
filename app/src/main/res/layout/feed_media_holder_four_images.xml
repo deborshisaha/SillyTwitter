@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="204dp"
+    android:id="@+id/images_holder"
+    android:layout_marginTop="10dp"
+    android:weightSum="10"
+    android:layout_below="@+id/tweet_text_textview">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:id="@+id/horizontal_1"
+        android:padding="1dp"
+        android:weightSum="10"
+        android:layout_weight="5">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:scaleType="fitXY"
+            android:cropToPadding="true"
+            android:layout_weight="5"
+            android:padding="1dp"
+            android:adjustViewBounds="true"
+            android:id="@+id/image_one_imageview"
+            android:background="@drawable/bordered_image"/>
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:scaleType="fitXY"
+            android:cropToPadding="true"
+            android:adjustViewBounds="true"
+            android:padding="1dp"
+            android:layout_marginLeft="2dp"
+            android:layout_weight="5"
+            android:background="@drawable/bordered_image"
+            android:id="@+id/image_two_imageview"/>
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_below="@+id/horizontal_1"
+        android:padding="1dp"
+        android:weightSum="10"
+        android:layout_weight="5">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:scaleType="fitXY"
+            android:cropToPadding="true"
+            android:layout_weight="5"
+            android:padding="1dp"
+            android:adjustViewBounds="true"
+            android:id="@+id/image_three_imageview"
+            android:background="@drawable/bordered_image"/>
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:scaleType="fitXY"
+            android:cropToPadding="true"
+            android:adjustViewBounds="true"
+            android:padding="1dp"
+            android:layout_marginLeft="2dp"
+            android:layout_weight="5"
+            android:background="@drawable/bordered_image"
+            android:id="@+id/image_four_imageview"/>
+    </LinearLayout>
+
+</RelativeLayout>

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <ImageView
+        android:layout_width="22dp"
+        android:layout_height="22dp"
+        android:layout_marginRight="40dp"
+        android:clickable="true"
+        android:id="@+id/reply_icon_imageview"
+        android:layout_alignParentLeft="true"
+        android:src="@drawable/ic_reply"/>
+
+    <RelativeLayout
+        android:layout_width="82dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/rlRetweetHolder"
+        android:paddingTop="1dp"
+        android:clickable="true"
+        android:layout_toRightOf="@+id/reply_icon_imageview">
+
+        <ImageView
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:src="@drawable/ic_retweet_grey"
+            android:id="@+id/retweet_icon"/>
+
+        <TextView
+            android:layout_width="60dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/retweet_count_textview"
+            android:layout_toRightOf="@+id/retweet_icon"/>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="82dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/rlFavoritesHolder"
+        android:clickable="true"
+        android:layout_toRightOf="@+id/rlRetweetHolder">
+
+        <ImageView
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:src="@drawable/ic_fav_grey"
+            android:id="@+id/favorite_icon"/>
+
+        <TextView
+            android:layout_width="60dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/favorite_count_textview"
+            android:layout_toRightOf="@+id/favorite_icon"/>
+
+    </RelativeLayout>
+</RelativeLayout>

@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="10dp">
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/user_identity_container_view">
+
+        <com.makeramen.roundedimageview.RoundedImageView
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/user_profile_picture_imageview"
+            android:layout_below="@+id/retweeted_info_icon"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            app:riv_corner_radius="5dp" />
+
+        <include layout="@layout/user_identity_container_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_toRightOf="@+id/user_profile_picture_imageview" />
+
+    </RelativeLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/tweet_text_textview"
+        android:textStyle="normal"
+        android:textColor="@color/black_color"
+        android:layout_marginTop="10dp"
+        android:layout_below="@+id/user_identity_container_view"
+        android:textSize="18sp"/>
+
+    <com.makeramen.roundedimageview.RoundedImageView
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/tweet_media_imageview"
+        android:layout_below="@+id/tweet_text_textview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        app:riv_corner_radius="5dp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tweet_media_imageview"
+        android:text="2/28/16, 2:03 AM"
+        android:id="@+id/timestamp_textview"
+        android:textColor="@color/light_gray"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:id="@+id/seperator_line_0"
+        android:layout_below="@+id/timestamp_textview"
+        android:background="#EDEDED"/>
+
+    <include layout="@layout/tweet_stats"
+        android:id="@+id/tweet_stats"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/seperator_line_0"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:id="@+id/seperator_line_1"
+        android:layout_below="@+id/tweet_stats"
+        android:background="#EDEDED"/>
+
+    <include layout="@layout/interaction_button"
+        android:id="@+id/interaction_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/seperator_line_1"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="10dp"
+        android:id="@+id/seperator_line_2"
+        android:layout_below="@+id/interaction_button"
+        android:background="#EDEDED"/>
+
+</RelativeLayout>

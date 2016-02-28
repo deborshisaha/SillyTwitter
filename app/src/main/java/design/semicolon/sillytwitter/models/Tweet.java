@@ -27,6 +27,8 @@ import design.semicolon.sillytwitter.helpers.DateHelper;
 @Table(name = "Tweet")
 public class Tweet extends Model implements Serializable {
 
+    public static final String TWEET = "Tweet";
+
     private String secondImageURL;
 
     @Column(name = "user", index = true)
@@ -56,6 +58,15 @@ public class Tweet extends Model implements Serializable {
     @Column(name = "user_mentioned")
     private boolean user_mentioned;
 
+    @Column(name = "favorited")
+    private boolean favorited;
+
+    @Column(name = "retweeted")
+    private boolean retweeted;
+
+    @Column(name = "retweeted_author_name")
+    private String retweeted_author_name;
+
     private List<TwitterMedia> twitterMedias;
 
     public User getUser() {
@@ -63,9 +74,18 @@ public class Tweet extends Model implements Serializable {
     }
 
     public List<TwitterMedia> getTwitterMedias() {
+
         if (twitterMedias == null){
+
             twitterMedias= new ArrayList<TwitterMedia>();
-            twitterMedias.addAll(getMany(TwitterMedia.class, "Tweet"));
+
+            List<TwitterMedia> medias = null;
+
+            //getMany(TwitterMedia.class, "Tweet");
+
+            if (medias != null) {
+                twitterMedias.addAll(medias);
+            }
         }
 
         return twitterMedias;
@@ -93,43 +113,53 @@ public class Tweet extends Model implements Serializable {
 
         try {
 
-            tweet.user = User.fromJSON(tweetObject.getJSONObject("user"));
-            tweet.uid = tweetObject.getLong("id");
-            tweet.uidStr = tweetObject.getString("id_str");
-            tweet.createdAt = tweetObject.getString("created_at");
-            tweet.retweet_count = tweetObject.getInt("retweet_count");
-            tweet.favorite_count = tweetObject.getInt("favorite_count");
-            tweet.timestamp = DateHelper.convertToDate(tweetObject.getString("created_at")).getTime();
+            // Original Tweet exists
+            if (tweetObject.optJSONObject("retweeted_status") != null) {
+                tweet = Tweet.fromJSON(tweetObject.getJSONObject("retweeted_status"));
 
-            if (tweetObject.optJSONObject("extended_entities") != null) {
-                JSONObject extendedEntitiesJSONObject = tweetObject.getJSONObject("extended_entities");
+                User u = User.fromJSON(tweetObject.getJSONObject("user"));
+                tweet.retweeted_author_name = u.getFullName();
+            } else {
+                tweet.user = User.fromJSON(tweetObject.getJSONObject("user"));
+                tweet.uid = tweetObject.getLong("id");
+                tweet.uidStr = tweetObject.getString("id_str");
+                tweet.createdAt = tweetObject.getString("created_at");
+                tweet.retweet_count = tweetObject.getInt("retweet_count");
+                tweet.favorite_count = tweetObject.getInt("favorite_count");
+                tweet.timestamp = DateHelper.convertToDate(tweetObject.getString("created_at")).getTime();
+                tweet.favorited = tweetObject.getBoolean("favorited");
+                tweet.retweeted = tweetObject.getBoolean("retweeted");
 
-                if (extendedEntitiesJSONObject.optJSONArray("media")!= null) {
-                    JSONArray mediasJSONArray = extendedEntitiesJSONObject.getJSONArray("media");
-                    for (int i = 0; i < mediasJSONArray.length(); i++) {
+                if (tweetObject.optJSONObject("extended_entities") != null) {
+                    JSONObject extendedEntitiesJSONObject = tweetObject.getJSONObject("extended_entities");
 
-                        JSONObject multimediaJSONObject = mediasJSONArray.getJSONObject(i);
-                        TwitterMedia twitterMedia = TwitterMedia.fromJSON(tweet,multimediaJSONObject);
-                        if (tweet.twitterMedias == null){
-                            tweet.twitterMedias = new ArrayList<TwitterMedia>();
+                    if (extendedEntitiesJSONObject.optJSONArray("media")!= null) {
+                        JSONArray mediasJSONArray = extendedEntitiesJSONObject.getJSONArray("media");
+                        for (int i = 0; i < mediasJSONArray.length(); i++) {
+
+                            JSONObject multimediaJSONObject = mediasJSONArray.getJSONObject(i);
+                            TwitterMedia twitterMedia = TwitterMedia.fromJSON(tweet,multimediaJSONObject);
+                            if (tweet.twitterMedias == null){
+                                tweet.twitterMedias = new ArrayList<TwitterMedia>();
+                            }
+
+                            tweet.twitterMedias.add(twitterMedia);
                         }
-
-                        tweet.twitterMedias.add(twitterMedia);
                     }
+                } else {
+                    Log.d("DEBUG", "No extended entities");
                 }
-            } else {
-                Log.d("DEBUG", "No extended entities");
-            }
 
-            if (tweet.twitterMedias != null && tweet.twitterMedias.size() > 0) {
-                // Remove the hyperlink in the text
-                String s = tweetObject.getString("text");
-                if (s.length() > 0) {
-                    s = s.replaceAll("https?://\\S+\\s?", "");
+                if (tweet.twitterMedias != null && tweet.twitterMedias.size() > 0) {
+                    // Remove the hyperlink in the text
+                    String s = tweetObject.getString("text");
+                    if (s.length() > 0) {
+                        s = s.replaceAll("https?://\\S+\\s?", "");
+                    }
+                    tweet.text = s;
+                } else {
+                    tweet.text = tweetObject.getString("text");
                 }
-                tweet.text = s;
-            } else {
-                tweet.text = tweetObject.getString("text");
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -257,5 +287,36 @@ public class Tweet extends Model implements Serializable {
 
     public void setUserMentioned(boolean um) {
         this.user_mentioned = um;
+    }
+
+    public boolean isLikedByUser() {
+        return this.favorited;
+    }
+
+    public void setLikedByUser(boolean liked) {
+        this.favorited = liked;
+        if (liked) {
+            favorite_count = favorite_count + 1;
+        } else {
+            favorite_count = favorite_count - 1;
+        }
+    }
+
+    public void setRetweetedByUser(boolean retweeted) {
+        this.retweeted = retweeted;
+        if (retweeted){
+            retweet_count = retweet_count+1;
+        } else {
+            retweet_count = retweet_count-1;
+        }
+
+    }
+
+    public String getRetweetAuthorName() {
+        return retweeted_author_name;
+    }
+
+    public boolean isRetweetedByUser() {
+        return this.retweeted;
     }
 }

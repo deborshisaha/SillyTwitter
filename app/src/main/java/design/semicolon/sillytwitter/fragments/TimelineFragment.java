@@ -17,12 +17,14 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import design.semicolon.sillytwitter.R;
+import design.semicolon.sillytwitter.activity.HomeActivity;
 import design.semicolon.sillytwitter.adapters.TweetsAdapter;
 import design.semicolon.sillytwitter.dao.TweetDao;
 import design.semicolon.sillytwitter.dao.TweetDaoImpl;
 import design.semicolon.sillytwitter.dao.UserDaoImpl;
 import design.semicolon.sillytwitter.exceptions.NoNetworkConnectionException;
 import design.semicolon.sillytwitter.listerners.OnTweetsLoadedListener;
+import design.semicolon.sillytwitter.listerners.TweetViewHolderEventListener;
 import design.semicolon.sillytwitter.models.Tweet;
 
 public class TimelineFragment extends Fragment {
@@ -38,6 +40,7 @@ public class TimelineFragment extends Fragment {
     private UserDaoImpl mUserDaoImpl;
     private TweetsAdapter mTweetAdapter;
     private LinearLayoutManager mLinearLayoutManager;
+    private TweetViewHolderEventListener mTweetViewHolderEventListener;
 
     private boolean loading = true;
     private int firstVisibleItem, visibleItemCount, totalItemCount, lastVisibleItem;
@@ -47,14 +50,13 @@ public class TimelineFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_timeline, container, false);
-
         ButterKnife.bind(this, view);
 
         // Initialize the adapter
-        mTweetAdapter = new TweetsAdapter(getActivity());
+        mTweetAdapter = new TweetsAdapter(getContext(), this.mTweetViewHolderEventListener);
 
         // Set the layout manager
-        mLinearLayoutManager = new LinearLayoutManager(getActivity());
+        mLinearLayoutManager = new LinearLayoutManager(getContext());
         mTimelineRecyclerView.setLayoutManager(mLinearLayoutManager);
 
         // Set adapter
@@ -62,6 +64,7 @@ public class TimelineFragment extends Fragment {
 
         // Listener listening to data load
         mOnTweetsLoadedListener = new OnTweetsLoadedListener() {
+
             @Override
             public void onTweetsLoaded(List<Tweet> tweets, boolean cached) {
                 loading = false;
@@ -75,7 +78,7 @@ public class TimelineFragment extends Fragment {
         };
 
         if (mTweetDaoImpl == null) {
-            mTweetDaoImpl = new TweetDaoImpl();
+            mTweetDaoImpl = new TweetDaoImpl(getContext());
         }
 
         if (mUserDaoImpl == null) {
@@ -86,7 +89,7 @@ public class TimelineFragment extends Fragment {
          * Load data on first load
          */
         try {
-            mTweetDaoImpl.fetchTimelineTweets(getActivity(), 1, 0, mOnTweetsLoadedListener, TweetDao.CachingStrategy.CacheOnly);
+            mTweetDaoImpl.fetchTimelineTweets(getContext(), 1, 0, mOnTweetsLoadedListener, TweetDao.CachingStrategy.CacheOnly);
         } catch (NoNetworkConnectionException e) {
             Toast.makeText(getActivity(), e.getReason() + ' ' + e.getRemedy(), Toast.LENGTH_LONG).show();
         }
@@ -98,6 +101,7 @@ public class TimelineFragment extends Fragment {
             Toast.makeText(getActivity(), e.getReason() + ' ' + e.getRemedy(), Toast.LENGTH_LONG).show();
         }
 
+        /*
         mTimelineRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
 
             @Override
@@ -135,7 +139,7 @@ public class TimelineFragment extends Fragment {
             }
         });
 
-        /*
+
         mTimelineRecyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
 
             @Override
@@ -189,13 +193,16 @@ public class TimelineFragment extends Fragment {
             }
         });
 
-
-
         return view;
     }
 
-    public static Fragment newInstance(String tabTitle) {
+    public void setHomeActivityEventListener(TweetViewHolderEventListener tweetViewHolderEventListener) {
+        this.mTweetViewHolderEventListener = tweetViewHolderEventListener;
+    }
+
+    public static TimelineFragment newInstance(String tabTitle, TweetViewHolderEventListener tweetViewHolderEventListener) {
         TimelineFragment fragment = new TimelineFragment();
+        fragment.setHomeActivityEventListener(tweetViewHolderEventListener);
         return fragment;
     }
 

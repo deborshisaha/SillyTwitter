@@ -49,6 +49,22 @@ public class SillyTwitterClient extends OAuthBaseClient {
         getClient().post(apiUrl, params, handler);
     }
 
+    public void postCreateLike(long id, AsyncHttpResponseHandler handler) {
+
+        String apiUrl = getApiUrl("favorites/create.json");
+        RequestParams params = new RequestParams();
+        params.put("id", id);
+        getClient().post(apiUrl, params, handler);
+    }
+
+    public void postDestroyLike(long id, AsyncHttpResponseHandler handler) {
+
+        String apiUrl = getApiUrl("favorites/destroy.json");
+        RequestParams params = new RequestParams();
+        params.put("id", id);
+        getClient().post(apiUrl, params, handler);
+    }
+
     public void verifyAccountCredentials (AsyncHttpResponseHandler handler) {
         String apiUrl = getApiUrl("account/verify_credentials.json");
         getClient().get(apiUrl, handler);
@@ -71,5 +87,15 @@ public class SillyTwitterClient extends OAuthBaseClient {
         }
 
         getClient().get(urlString, params, handler);
+    }
+
+    public void postCreateTweet(long uid, AsyncHttpResponseHandler handler) {
+        String apiUrl = getApiUrl("statuses/retweet/"+uid+".json");
+        getClient().get(apiUrl, handler);
+    }
+
+    public void postDestroyTweet(long uid, AsyncHttpResponseHandler handler) {
+        String apiUrl = getApiUrl("statuses/unretweet/"+uid+".json");
+        getClient().get(apiUrl, handler);
     }
 }

@@ -5,7 +5,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
-import android.support.v4.app.FragmentManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -27,15 +26,14 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.makeramen.roundedimageview.RoundedImageView;
 
 import org.apache.http.Header;
-import org.json.JSONArray;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
-public class ComposeNewTweetFragment extends DialogFragment {
+public class ComposeTweetFragment extends DialogFragment {
 
     @Bind(R.id.current_user_profile_picture_imageview)
     RoundedImageView current_user_profile_picture_imageview;
@@ -54,6 +52,8 @@ public class ComposeNewTweetFragment extends DialogFragment {
 
     private Context context;
 
+    private Tweet replyToTweet;
+
     public static final String USER_KEY = "user";
 
     private boolean goodToPost = false;
@@ -62,14 +62,16 @@ public class ComposeNewTweetFragment extends DialogFragment {
 
     private TextInputLayout composeTweetEditTextInputlayout ;
 
-    public ComposeNewTweetFragment() {}
+    public ComposeTweetFragment() {}
 
     public OnTweetPostedHandler mOnTweetPostedHandler;
 
-    public static ComposeNewTweetFragment newInstance(User user, Context context, OnTweetPostedHandler handler) {
-        ComposeNewTweetFragment frag = new ComposeNewTweetFragment();
+    public static ComposeTweetFragment newInstance(User user, Tweet tweet, Context context, OnTweetPostedHandler handler) {
+        ComposeTweetFragment frag = new ComposeTweetFragment();
         frag.context = context;
         frag.mOnTweetPostedHandler = handler;
+        frag.replyToTweet = tweet;
+
         Bundle args = new Bundle();
         args.putSerializable(USER_KEY, user);
         frag.setArguments(args);
@@ -92,7 +94,7 @@ public class ComposeNewTweetFragment extends DialogFragment {
         User user = (User) getArguments().getSerializable(USER_KEY);
 
         current_user_name_textview.setText(user.getFullName());
-        current_user_screenname_textview.setText("@" + user.getUserName());
+        current_user_screenname_textview.setText(user.getUserName());
 
         post_tweet_button.setEnabled(false);
         post_tweet_button.setOnClickListener(new View.OnClickListener() {
@@ -114,7 +116,7 @@ public class ComposeNewTweetFragment extends DialogFragment {
                         tweet.save();
                         mOnTweetPostedHandler.onTweetPosted(tweet);
 
-                        ComposeNewTweetFragment.this.dismiss();
+                        ComposeTweetFragment.this.dismiss();
                     }
 
                 });
@@ -126,6 +128,13 @@ public class ComposeNewTweetFragment extends DialogFragment {
         }
 
         composeTweetEditTextInputlayout = (TextInputLayout) view.findViewById(R.id.username_text_input_layout);
+
+        EditText editText = (EditText) composeTweetEditTextInputlayout.getEditText();
+
+        if (this.replyToTweet != null) {
+            editText.setText(this.replyToTweet.getUser().getUserName()+" ");
+        }
+
         composeTweetEditTextInputlayout.getEditText().addTextChangedListener(new TextWatcher() {
 
             @Override

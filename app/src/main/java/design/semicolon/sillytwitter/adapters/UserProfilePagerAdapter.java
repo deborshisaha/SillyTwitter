@@ -4,18 +4,20 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
-import design.semicolon.sillytwitter.activity.HomeActivity;
-import design.semicolon.sillytwitter.fragments.TimelineFragment;
 import design.semicolon.sillytwitter.fragments.UserLikesFragment;
+import design.semicolon.sillytwitter.fragments.UserPhotosFragment;
+import design.semicolon.sillytwitter.fragments.UserTweetsFragment;
 import design.semicolon.sillytwitter.listerners.TweetViewHolderEventListener;
 
-public class HomePagerAdapter extends FragmentPagerAdapter {
-
-    final int PAGE_COUNT = 2;
-    private String tabTitles[] = new String[] { "Home", "Mentions"};
+/**
+ * Created by dsaha on 2/27/16.
+ */
+public class UserProfilePagerAdapter extends FragmentPagerAdapter {
+    final int PAGE_COUNT = 3;
+    private String tabTitles[] = new String[] { "Tweets", "Photos", "Likes"};
     private TweetViewHolderEventListener mTweetViewHolderEventListener;
 
-    public HomePagerAdapter(FragmentManager fm,  TweetViewHolderEventListener tweetViewHolderEventListener) {
+    public UserProfilePagerAdapter(FragmentManager fm, TweetViewHolderEventListener tweetViewHolderEventListener) {
         super(fm);
         this.mTweetViewHolderEventListener = tweetViewHolderEventListener;
     }
@@ -29,7 +31,9 @@ public class HomePagerAdapter extends FragmentPagerAdapter {
     public Fragment getItem(int position) {
 
         if (position == 0) {
-            return TimelineFragment.newInstance(tabTitles[position], this.mTweetViewHolderEventListener);
+            return UserTweetsFragment.newInstance(tabTitles[position], this.mTweetViewHolderEventListener);
+        } else if (position == 1) {
+            return UserPhotosFragment.newInstance(tabTitles[position], this.mTweetViewHolderEventListener);
         }
 
         return UserLikesFragment.newInstance(tabTitles[position], this.mTweetViewHolderEventListener);
@@ -37,7 +41,6 @@ public class HomePagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public CharSequence getPageTitle(int position) {
-        // Generate title based on item position
         return tabTitles[position];
     }
 }

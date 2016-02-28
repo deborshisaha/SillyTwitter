@@ -26,6 +26,7 @@ import design.semicolon.sillytwitter.dao.UserDaoImpl;
 import design.semicolon.sillytwitter.exceptions.NoNetworkConnectionException;
 import design.semicolon.sillytwitter.listerners.OnTweetsLoadedListener;
 import design.semicolon.sillytwitter.listerners.OnUsersLoadedListener;
+import design.semicolon.sillytwitter.listerners.TweetViewHolderEventListener;
 import design.semicolon.sillytwitter.models.Tweet;
 import design.semicolon.sillytwitter.models.User;
 
@@ -43,6 +44,12 @@ public class MentionsFragment extends Fragment {
     private TweetsAdapter mTweetAdapter;
     private LinearLayoutManager mLinearLayoutManager;
 
+    public void setTweetViewHolderEventListener(TweetViewHolderEventListener mTweetViewHolderEventListener) {
+        this.mTweetViewHolderEventListener = mTweetViewHolderEventListener;
+    }
+
+    private TweetViewHolderEventListener mTweetViewHolderEventListener;
+
     private boolean loading = true;
     private int firstVisibleItem, visibleItemCount, totalItemCount, lastVisibleItem;
 
@@ -56,7 +63,7 @@ public class MentionsFragment extends Fragment {
 
         // Initialize
         if (mTweetDaoImpl == null) {
-            mTweetDaoImpl = new TweetDaoImpl();
+            mTweetDaoImpl = new TweetDaoImpl(getContext());
         }
 
         if (mUserDaoImpl == null) {
@@ -64,7 +71,7 @@ public class MentionsFragment extends Fragment {
         }
 
         // Initialize the adapter
-        mTweetAdapter = new TweetsAdapter(getActivity());
+        mTweetAdapter = new TweetsAdapter(getContext(), this.mTweetViewHolderEventListener);
 
         // Set the layout manager
         mLinearLayoutManager = new LinearLayoutManager(getActivity());
@@ -208,9 +215,10 @@ public class MentionsFragment extends Fragment {
         }
     }
 
-    public static Fragment newInstance(String tabTitle) {
-        TimelineFragment fragment = new TimelineFragment();
-        return fragment;
+    public static MentionsFragment newInstance(String tabTitle, TweetViewHolderEventListener tweetViewHolderEventListener) {
+        MentionsFragment mentionsFragment = new MentionsFragment();
+        mentionsFragment.setTweetViewHolderEventListener(tweetViewHolderEventListener);
+        return mentionsFragment;
     }
 
     private static String getFragmentKey(String tabTitle) {

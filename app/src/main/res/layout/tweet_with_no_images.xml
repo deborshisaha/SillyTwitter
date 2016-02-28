@@ -1,132 +1,76 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:paddingTop="10dp"
-    tools:context="design.semicolon.sillytwitter.activity.TimelineActivity">
-
-    <com.makeramen.roundedimageview.RoundedImageView
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/user_profile_picture_imageview"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        app:riv_corner_radius="5dp" />
+    android:layout_height="match_parent">
 
     <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/user_identity_layout"
-        android:layout_toRightOf="@+id/user_profile_picture_imageview">
+        android:paddingTop="5dp"
+        android:paddingRight="5dp"
+        android:paddingLeft="10dp"
+        android:id="@+id/left_column">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/user_full_name_textview"
-            android:textStyle="bold"
-            android:textColor="@color/black_color"
-            android:layout_marginRight="4dp" />
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/ic_retweet_info"
+            android:layout_alignRight="@+id/user_profile_picture_imageview"
+            android:id="@+id/retweeted_info_icon"/>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/username_textview"
-            android:layout_toRightOf="@+id/user_full_name_textview"/>
+        <com.makeramen.roundedimageview.RoundedImageView
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/user_profile_picture_imageview"
+            android:layout_below="@+id/retweeted_info_icon"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            app:riv_corner_radius="5dp" />
 
     </RelativeLayout>
 
 
-    <TextView
+    <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/relative_time_textview"
-        android:layout_alignParentRight="true"
-        android:layout_marginRight="8dp"
-        android:layout_alignTop="@+id/user_profile_picture_imageview"/>
+        android:id="@+id/right_column"
+        android:paddingTop="5dp"
+        android:paddingLeft="5dp"
+        android:paddingRight="10dp"
+        android:layout_toRightOf="@+id/left_column" >
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginRight="8dp"
-        android:id="@+id/tweet_content"
-        android:layout_toRightOf="@+id/user_profile_picture_imageview"
-        android:layout_below="@+id/user_identity_layout">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Retweeted"
+            android:id="@+id/retweeted_author_name_textview"/>
+
+        <include layout="@layout/feed_user_identity_layout"
+            android:id="@+id/feed_user_identity_layout"
+            android:layout_below="@+id/retweeted_author_name_textview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/relative_time_textview"
+            android:layout_alignParentRight="true"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/tweet_text_textview"
             android:autoLink="all"
-            android:linksClickable="true" />
+            android:linksClickable="true"
+            android:layout_below="@+id/feed_user_identity_layout"/>
 
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/user_interactions_holder"
-        android:layout_marginRight="8dp"
-        android:layout_marginTop="10dp"
-        android:layout_toRightOf="@+id/user_profile_picture_imageview"
-        android:layout_below="@+id/tweet_content">
-
-        <ImageView
-            android:layout_width="22dp"
-            android:layout_height="22dp"
-            android:layout_marginRight="60dp"
-            android:clickable="true"
-            android:id="@+id/reply_icon_imageview"
-            android:layout_alignParentLeft="true"
-            android:src="@drawable/ic_reply"/>
-
-        <RelativeLayout
-            android:layout_width="82dp"
+        <include layout="@layout/feed_interaction_buttons"
+            android:id="@+id/feed_interaction_buttons"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/rlRetweetHolder"
-            android:paddingTop="1dp"
-            android:clickable="true"
-            android:layout_toRightOf="@+id/reply_icon_imageview">
-
-            <ImageView
-                android:layout_width="22dp"
-                android:layout_height="22dp"
-                android:src="@drawable/ic_retweet_grey"
-                android:id="@+id/retweet_icon"/>
-
-            <TextView
-                android:layout_width="60dp"
-                android:layout_height="wrap_content"
-                android:id="@+id/retweet_count_textview"
-                android:layout_toRightOf="@+id/retweet_icon"/>
-
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:layout_width="82dp"
-            android:layout_height="wrap_content"
-            android:id="@+id/rlFavoritesHolder"
-            android:clickable="true"
-            android:layout_toRightOf="@+id/rlRetweetHolder">
-
-            <ImageView
-                android:layout_width="18dp"
-                android:layout_height="18dp"
-                android:src="@drawable/ic_fav_grey"
-                android:id="@+id/favorite_icon"/>
-
-            <TextView
-                android:layout_width="60dp"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="4dp"
-                android:id="@+id/favorite_count_textview"
-                android:layout_toRightOf="@+id/favorite_icon"/>
-
-        </RelativeLayout>
+            android:layout_below="@+id/tweet_text_textview"
+            android:layout_marginRight="8dp"
+            android:layout_marginTop="10dp"/>
 
     </RelativeLayout>
 
@@ -135,7 +79,7 @@
         android:layout_height="1dp"
         android:layout_marginTop="10dp"
         android:id="@+id/seperator_line"
-        android:layout_below="@+id/user_interactions_holder"
+        android:layout_below="@+id/right_column"
         android:background="#EDEDED"/>
 
 </RelativeLayout>

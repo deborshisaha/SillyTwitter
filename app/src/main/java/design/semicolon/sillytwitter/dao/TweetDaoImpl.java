@@ -3,6 +3,7 @@ package design.semicolon.sillytwitter.dao;
 import android.content.Context;
 import android.content.res.Resources;
 import android.preference.PreferenceManager;
+import android.support.v4.app.FragmentActivity;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
 
@@ -50,17 +51,19 @@ public class TweetDaoImpl implements TweetDao {
     public TweetDaoImpl() { super();}
 
     @Override
-    public void fetchTimelineTweets(Context context,  long since_id, long max_id, final OnTweetsLoadedListener onTweetsLoadedListener, int cachingStrategy) throws NoNetworkConnectionException {
+    public void fetchTimelineTweets(Context context,  long since_id, long max_id, final OnTweetsLoadedListener onTweetsLoadedListener, CachingStrategy cachingStrategy) throws NoNetworkConnectionException {
 
         ///////// Remove this ///////////
         if (CachingStrategy.CacheOnly == cachingStrategy) {
 
             try {
-                String mentionedTweetsString = getStringFromRaw(context, R.raw.deborshisaha_user_timeline);
-                JSONArray mentionedTweetsJSONArray = new JSONArray(mentionedTweetsString);
-                List<Tweet> mentionedTweets = getArrayOfTweetObjects(mentionedTweetsJSONArray, true);
-                PersistenceManager.persistTweets(mentionedTweets);
-                onTweetsLoadedListener.onTweetsLoaded(Tweet.all(), false);
+                String homeTimelineTweetsString = getStringFromRaw(context, R.raw.deborshisaha_home_timeline);
+                JSONArray homeTimelineTweetsJSONArray = new JSONArray(homeTimelineTweetsString);
+                List<Tweet> homeTimelineTweets = getArrayOfTweetObjects(homeTimelineTweetsJSONArray, true);
+
+                // TODO : Persist tweets uncomment
+                //PersistenceManager.persistTweets(mentionedTweets);
+                onTweetsLoadedListener.onTweetsLoaded(homeTimelineTweets, false);
 
             } catch(Throwable t) {
                 t.printStackTrace();
@@ -110,22 +113,21 @@ public class TweetDaoImpl implements TweetDao {
     }
 
     @Override
-    public void fetchMentions( Context context, final OnTweetsLoadedListener onTweetsLoadedListener, int cachingStrategy) throws NoNetworkConnectionException {
+    public void fetchMentions( Context context, final OnTweetsLoadedListener onTweetsLoadedListener, CachingStrategy cachingStrategy) throws NoNetworkConnectionException {
         ///////// Remove this ///////////
         if (CachingStrategy.CacheOnly == cachingStrategy) {
 
             try {
 
-                Tweet.deleteAll();
-                User.deleteAll();
-                TwitterMedia.deleteAll();
                 String mentionedTweetsString = getStringFromRaw(context, R.raw.deborshisaha_mentions);
 
                 JSONArray mentionedTweetsJSONArray = new JSONArray(mentionedTweetsString);
                 List<Tweet> mentionedTweets = getArrayOfTweetObjects(mentionedTweetsJSONArray, true);
 
                 PersistenceManager.persistTweets(mentionedTweets);
-                onTweetsLoadedListener.onTweetsLoaded(Tweet.getTweetsUserWasMentioned(), false);
+
+                List<Tweet> mentions = Tweet.getTweetsUserWasMentioned();
+                onTweetsLoadedListener.onTweetsLoaded(mentions, false);
             } catch(Throwable t) {
                 t.printStackTrace();
             }
@@ -290,5 +292,90 @@ public class TweetDaoImpl implements TweetDao {
         } else {
             return 10;
         }
+    }
+
+    @Override
+    public void fetchUserLikedTweets(Context context, int since_id, int max_id, OnTweetsLoadedListener onTweetsLoadedListener, CachingStrategy cachingStrategy) throws NoNetworkConnectionException {
+
+        ///////// Remove this ///////////
+        if (CachingStrategy.CacheOnly == cachingStrategy) {
+
+            try {
+                String userLikedTweetsString = getStringFromRaw(context, R.raw.deborshisaha_user_liked_tweets);
+                JSONArray userLikedTweetsJSONArray = new JSONArray(userLikedTweetsString);
+                List<Tweet> userLikedTweets = getArrayOfTweetObjects(userLikedTweetsJSONArray, true);
+                //PersistenceManager.persistTweets(userLikedTweets);
+                onTweetsLoadedListener.onTweetsLoaded(userLikedTweets, false);
+
+            } catch(Throwable t) {
+                t.printStackTrace();
+            }
+
+            return;
+        }
+        ///////// Remove this ///////////
+    }
+
+    public void fetchUserMedia(Context context, int since_id, int max_id, OnTweetsLoadedListener onTweetsLoadedListener, CachingStrategy cachingStrategy) throws NoNetworkConnectionException {
+    /*
+        ///////// Remove this ///////////
+        if (CachingStrategy.CacheOnly == cachingStrategy) {
+
+            try {
+                String mentionedTweetsString = getStringFromRaw(context, R.raw.deborshisaha_user_media);
+                JSONArray mentionedTweetsJSONArray = new JSONArray(mentionedTweetsString);
+                List<Tweet> mentionedTweets = getArrayOfTweetObjects(mentionedTweetsJSONArray, true);
+                PersistenceManager.persistTweets(mentionedTweets);
+                onTweetsLoadedListener.onTweetsLoaded(Tweet.all(), false);
+
+            } catch(Throwable t) {
+                t.printStackTrace();
+            }
+
+            return;
+        }
+        ///////// Remove this ///////////
+    */
+    }
+
+    public void fetchUserTweets(Context context, int since_id, int max_id, OnTweetsLoadedListener onTweetsLoadedListener, CachingStrategy cachingStrategy) throws NoNetworkConnectionException {
+
+        ///////// Remove this ///////////
+        if (CachingStrategy.CacheOnly == cachingStrategy) {
+
+            try {
+                String mentionedTweetsString = getStringFromRaw(context, R.raw.deborshisaha_user_timeline);
+                JSONArray mentionedTweetsJSONArray = new JSONArray(mentionedTweetsString);
+                List<Tweet> mentionedTweets = getArrayOfTweetObjects(mentionedTweetsJSONArray, true);
+                PersistenceManager.persistTweets(mentionedTweets);
+                onTweetsLoadedListener.onTweetsLoaded(Tweet.all(), false);
+
+            } catch(Throwable t) {
+                t.printStackTrace();
+            }
+
+            return;
+        }
+        ///////// Remove this ///////////
+    }
+
+    @Override
+    public void postTweetLike(Tweet tweet) throws NoNetworkConnectionException {
+        SillyTwitterApplication.getRestClient().postCreateLike(tweet.getUid(), null);
+    }
+
+    @Override
+    public void postTweetUnliked(Tweet tweet) throws NoNetworkConnectionException {
+        SillyTwitterApplication.getRestClient().postDestroyLike(tweet.getUid(), null);
+    }
+
+    @Override
+    public void postUndoRetweet(Tweet tweet) throws NoNetworkConnectionException {
+        SillyTwitterApplication.getRestClient().postDestroyTweet(tweet.getUid(), null);
+    }
+
+    @Override
+    public void postRetweet(Tweet tweet) throws NoNetworkConnectionException{
+        SillyTwitterApplication.getRestClient().postCreateTweet(tweet.getUid(), null);
     }
 }

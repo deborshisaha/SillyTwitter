@@ -16,7 +16,7 @@ import design.semicolon.sillytwitter.models.User;
  */
 public class PersistenceManager {
 
-    public static boolean fetchCachedTimelineTweets( int cachingStrategy, OnTweetsLoadedListener onTweetsLoadedListener) {
+    public static boolean fetchCachedTimelineTweets( TweetDao.CachingStrategy cachingStrategy, OnTweetsLoadedListener onTweetsLoadedListener) {
 
         if (cachingStrategy == TweetDao.CachingStrategy.CacheOnly || cachingStrategy == TweetDao.CachingStrategy.CacheThenNetwork) {
             onTweetsLoadedListener.onTweetsLoaded(Tweet.all(), true);
@@ -52,7 +52,7 @@ public class PersistenceManager {
         }
     }
 
-    public static boolean fetchUserMentionedTweets(int cachingStrategy, OnTweetsLoadedListener onTweetsLoadedListener) {
+    public static boolean fetchUserMentionedTweets(TweetDao.CachingStrategy cachingStrategy, OnTweetsLoadedListener onTweetsLoadedListener) {
 
         if (cachingStrategy == TweetDao.CachingStrategy.CacheOnly || cachingStrategy == TweetDao.CachingStrategy.CacheThenNetwork) {
             onTweetsLoadedListener.onTweetsLoaded(Tweet.getTweetsUserWasMentioned(), true);

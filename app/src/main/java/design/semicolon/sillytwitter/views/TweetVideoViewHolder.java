@@ -11,6 +11,7 @@ import com.volokh.danylo.video_player_manager.ui.VideoPlayerView;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import design.semicolon.sillytwitter.R;
+import design.semicolon.sillytwitter.listerners.TweetViewHolderEventListener;
 import design.semicolon.sillytwitter.models.Tweet;
 
 /**
@@ -21,11 +22,11 @@ public class TweetVideoViewHolder extends TweetViewHolder {
     @Bind(R.id.image_one_imageview)
     ImageView image_one_imageview;
 
-    @Bind(R.id.videoplayer_view)
-    VideoView videoplayerView;
+//    @Bind(R.id.videoplayer_view)
+//    VideoView videoplayerView;
 
-    public TweetVideoViewHolder(View itemView, Context context){
-        super(itemView, context);
+    public TweetVideoViewHolder(View itemView, Context context, TweetViewHolderEventListener tweetViewHolderEventListener){
+        super(itemView, context, tweetViewHolderEventListener);
 
         ButterKnife.bind(this, itemView);
     }

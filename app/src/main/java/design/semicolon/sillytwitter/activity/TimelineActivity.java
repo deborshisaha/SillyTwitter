@@ -1,6 +1,5 @@
 package design.semicolon.sillytwitter.activity;
 
-import android.support.v7.app.ActionBar;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -27,7 +26,7 @@ import design.semicolon.sillytwitter.dao.TweetDao;
 import design.semicolon.sillytwitter.dao.TweetDaoImpl;
 import design.semicolon.sillytwitter.dao.UserDaoImpl;
 import design.semicolon.sillytwitter.exceptions.NoNetworkConnectionException;
-import design.semicolon.sillytwitter.fragments.ComposeNewTweetFragment;
+import design.semicolon.sillytwitter.fragments.ComposeTweetFragment;
 import design.semicolon.sillytwitter.listerners.OnTweetsLoadedListener;
 import design.semicolon.sillytwitter.listerners.OnUsersLoadedListener;
 import design.semicolon.sillytwitter.models.Tweet;
@@ -80,7 +79,7 @@ public class TimelineActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         // Initialize the adapter
-        mTweetAdapter = new TweetsAdapter(TimelineActivity.this);
+        //mTweetAdapter = new TweetsAdapter(TimelineActivity.this);
 
         // Set the layout manager
         mLinearLayoutManager = new LinearLayoutManager(this);
@@ -281,7 +280,7 @@ public class TimelineActivity extends AppCompatActivity {
     private void showComposeNewTweetDialog() throws JSONException {
         User user = User.currentUser(TimelineActivity.this);
 
-        ComposeNewTweetFragment frag = ComposeNewTweetFragment.newInstance(user, TimelineActivity.this, new ComposeNewTweetFragment.OnTweetPostedHandler() {
+        ComposeTweetFragment frag = ComposeTweetFragment.newInstance(user, null, TimelineActivity.this, new ComposeTweetFragment.OnTweetPostedHandler() {
             @Override
             public void onTweetPosted(Tweet newTweet) {
                 mTweetAdapter.addTweet(newTweet);

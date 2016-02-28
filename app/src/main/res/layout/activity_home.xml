@@ -9,7 +9,7 @@
     <com.astuetz.PagerSlidingTabStrip
         android:id="@+id/tabs"
         app:pstsShouldExpand="true"
-        app:pstsTextAllCaps="true"
+        app:pstsTextAllCaps="false"
         android:textSize="14sp"
         android:background="#ffffff"
         android:textColor="#55acee"

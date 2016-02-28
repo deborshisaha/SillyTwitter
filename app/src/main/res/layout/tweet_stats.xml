@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="25dp"
+        android:id="@+id/number_of_retweets_container_view">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_message"
+            android:textStyle="bold"
+            android:text="38"
+            android:textColor="@color/black_color"
+            android:id="@+id/number_of_retweets_textview"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_toRightOf="@+id/number_of_retweets_textview"
+            android:text="Retweets"
+            android:textColor="@color/light_gray"/>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/number_of_retweets_container_view"
+        android:id="@+id/number_of_likes_container_view">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:text="78"
+            android:textColor="@color/black_color"
+            android:id="@+id/number_of_likes_textview"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_toRightOf="@+id/number_of_likes_textview"
+            android:text="Likes"
+            android:textColor="@color/light_gray" />
+
+    </RelativeLayout>
+
+</RelativeLayout>
