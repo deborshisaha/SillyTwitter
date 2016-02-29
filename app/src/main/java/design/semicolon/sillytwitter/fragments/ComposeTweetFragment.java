@@ -31,7 +31,6 @@ import com.makeramen.roundedimageview.RoundedImageView;
 
 import org.apache.http.Header;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 public class ComposeTweetFragment extends DialogFragment {
 
@@ -81,7 +80,7 @@ public class ComposeTweetFragment extends DialogFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.compose_new_tweet_fragment, container, false);
+        View view = inflater.inflate(R.layout.compose_tweet_fragment, container, false);
         ButterKnife.bind(this, view);
         return view;
     }
@@ -124,7 +123,7 @@ public class ComposeTweetFragment extends DialogFragment {
         });
 
         if (user.getUserProfilePictureURLString()!= null) {
-            Glide.with(context).load(user.getUserProfilePictureURLString()).placeholder(R.drawable.placeholder).into(current_user_profile_picture_imageview);
+            Glide.with(context).load(user.getUserProfilePictureURLString()).placeholder(R.drawable.placeholder_medium).into(current_user_profile_picture_imageview);
         }
 
         composeTweetEditTextInputlayout = (TextInputLayout) view.findViewById(R.id.username_text_input_layout);

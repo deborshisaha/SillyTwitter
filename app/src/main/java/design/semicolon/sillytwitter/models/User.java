@@ -1,6 +1,8 @@
 package design.semicolon.sillytwitter.models;
 
 import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
@@ -14,7 +16,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
+
+import design.semicolon.sillytwitter.listerners.OnFetchingCompleteListener;
 
 @Table(name = "User")
 public class User extends Model implements Serializable {
@@ -48,6 +53,13 @@ public class User extends Model implements Serializable {
 
     @Column(name = "location")
     private String location;
+
+    public String getProfileBackgroundColor() {
+        return profileBackgroundColor;
+    }
+
+    @Column(name = "profile_background_color")
+    private String profileBackgroundColor;
 
     public static void setCurrentUser(Context context, JSONObject jsonObject){
         PreferenceManager.getDefaultSharedPreferences(context).edit().putString(CURRENT_USER, jsonObject.toString()).apply();
@@ -87,6 +99,46 @@ public class User extends Model implements Serializable {
         }
     }
 
+    public List<Tweet> allTweets() {
+
+        User user = new Select()
+                .from(User.class)
+                .where("screen_name= ?", this.screenName)
+                .executeSingle();
+
+        return new Select().from(Tweet.class).where("user = ?", user.getId()).orderBy("timestamp DESC").execute();
+    }
+
+    public List<Tweet> favorites() {
+
+        User user = new Select()
+                .from(User.class)
+                .where("screen_name= ?", this.screenName)
+                .executeSingle();
+
+        return new Select().from(Tweet.class).where("user = ? & favorited = ?", user.getId(), true).orderBy("timestamp DESC").execute();
+    }
+
+
+    public void fetchMediaInBackground (final OnFetchingCompleteListener onFetchingCompleteListener) {
+
+        Handler uiHandler = new Handler(Looper.getMainLooper());
+        Runnable runnable = new Runnable() {
+
+            @Override
+            public void run() {
+                List<Tweet> tweets = allTweets();
+                List<TwitterMedia> userGeneratedMedia = new ArrayList<TwitterMedia>();
+
+                for(Tweet tweet:tweets) {
+                    userGeneratedMedia.addAll(tweet.allMedia());
+                }
+                onFetchingCompleteListener.mediaFetched(userGeneratedMedia);
+            }
+        };
+        uiHandler.post(runnable);
+    }
+
     public User(){}
 
     public String getFullName() {
@@ -114,8 +166,10 @@ public class User extends Model implements Serializable {
             user.followersCount = userObject.getInt("followers_count");
             user.friendsCount = userObject.getInt("friends_count");
 
-            if (userObject.optString("profile_banner_url") != null){
+            if (userObject.optString("profile_banner_url").length() != 0){
                 user.profileBannerImageURL = userObject.getString("profile_banner_url");
+            }else if (userObject.optString("profile_background_color").length() != 0){
+                user.profileBackgroundColor = userObject.getString("profile_background_color");
             }
 
             String s = userObject.getString("profile_image_url");
@@ -130,6 +184,11 @@ public class User extends Model implements Serializable {
         }
 
         return user;
+    }
+
+
+    public long getUid() {
+        return uid;
     }
 
     public static List<User> all() {
@@ -162,6 +221,15 @@ public class User extends Model implements Serializable {
 
     public String getLocation() {
         return location;
+    }
+
+    private User getUserWithScreenName(User user) {
+        String screenName = user.screenName;
+        User result = new Select()
+                .from(User.class)
+                .where("screen_name= ?", screenName)
+                .executeSingle();
+        return result;
     }
 
 }

@@ -50,20 +50,7 @@ public class TimelineActivity extends AppCompatActivity {
 
     private boolean loading = true;
     private int firstVisibleItem, visibleItemCount, totalItemCount, lastVisibleItem;
-    private int lastVideoPlayingIndex = -1;
 
-
-    /*
-    private ListItemsVisibilityCalculator mListItemVisibilityCalculator = null;
-    private RecyclerViewItemPositionGetter mItemsPositionGetter = null;
-    private int mScrollState = AbsListView.OnScrollListener.SCROLL_STATE_IDLE;
-    private final VideoPlayerManager<MetaData> mVideoPlayerManager = new SingleVideoPlayerManager(new PlayerItemChangeListener() {
-        @Override
-        public void onPlayerItemChanged(MetaData metaData) {
-
-        }
-    });
-    */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -89,18 +76,18 @@ public class TimelineActivity extends AppCompatActivity {
         mTimelineRecyclerView.setAdapter(mTweetAdapter);
 
         // Listener listening to data load
-        mOnTweetsLoadedListener = new OnTweetsLoadedListener() {
-            @Override
-            public void onTweetsLoaded(List<Tweet> tweets, boolean cached) {
-                loading = false;
-                swipeContainer.setRefreshing(false);
-
-                if (tweets != null) {
-                    mTweetAdapter.addTweets(tweets);
-                    mTweetAdapter.notifyDataSetChanged();
-                }
-            }
-        };
+//        mOnTweetsLoadedListener = new OnTweetsLoadedListener() {
+//            @Override
+//            public void onTweetsLoaded(List<Tweet> tweets, boolean cached) {
+//                loading = false;
+//                swipeContainer.setRefreshing(false);
+//
+//                if (tweets != null) {
+//                    mTweetAdapter.addTweets(tweets);
+//                    mTweetAdapter.notifyDataSetChanged();
+//                }
+//            }
+//        };
 
         if (mTweetDaoImpl == null) {
             mTweetDaoImpl = new TweetDaoImpl();
@@ -290,7 +277,7 @@ public class TimelineActivity extends AppCompatActivity {
         });
 
         FragmentManager fm = getSupportFragmentManager();
-        frag.show(fm, "compose_new_tweet_fragment");
+        frag.show(fm, "compose_tweet_fragment");
     }
 
     /*

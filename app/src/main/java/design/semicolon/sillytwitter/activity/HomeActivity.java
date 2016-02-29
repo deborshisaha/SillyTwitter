@@ -43,6 +43,11 @@ public class HomeActivity extends AppCompatActivity{
         viewPager.setAdapter(new HomePagerAdapter(getSupportFragmentManager(), new TweetViewHolderEventListener() {
 
             @Override
+            public void didPressMediaAtIndex(int mediaIndex) {
+
+            }
+
+            @Override
             public void didPressProfilePicture(Tweet tweet) {
                 Log.d("DEBUG", "didPressProfilePicture: "+tweet.getUser().getFullName());
                 showUserProfile(tweet.getUser());
@@ -148,7 +153,7 @@ public class HomeActivity extends AppCompatActivity{
     private void showComposeNewTweetDialog() throws JSONException {
 
         User user = User.currentUser(HomeActivity.this);
-        ComposeTweetFragment frag = ComposeTweetFragment.newInstance(user, null, HomeActivity.this, null});
+        ComposeTweetFragment frag = ComposeTweetFragment.newInstance(user, null, HomeActivity.this, null);
 
         FragmentManager fm = getSupportFragmentManager();
         frag.show(fm, "compose_tweet_fragment");

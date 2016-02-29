@@ -28,44 +28,44 @@ import design.semicolon.sillytwitter.models.User;
 
 public class UserProfileActivity extends AppCompatActivity {
 
-    @Bind(R.id.app_bar)
-    AppBarLayout mAppBarLayout;
+//    @Bind(R.id.app_bar)
+//    AppBarLayout mAppBarLayout;
+//
+//    @Bind(R.id.toolbar)
+//    Toolbar mToolbar;
+//
+//    @Bind(R.id.user_profile_banner_image_view)
+//    ImageView mUserProfileBannerImageView;
 
-    @Bind(R.id.toolbar)
-    Toolbar mToolbar;
+//    @Bind(R.id.user_profile_picture_imageview)
+//    RoundedImageView mUserProfilePictureImageView;
+//
+//    @Bind(R.id.user_screen_name_textview)
+//    TextView mUserScreenNameTextView;
+//
+//    @Bind(R.id.user_full_name_textview)
+//    TextView mUserFullnameTextView;
+//
+//    @Bind(R.id.user_about_textview)
+//    TextView mUserBioTextView;
+//
+//    @Bind(R.id.user_location_name_textview)
+//    TextView mUserLocationTextView;
+//
+//    @Bind(R.id.user_number_of_followers_textview)
+//    TextView mUserNumberOfFollowersTextView;
+//
+//    @Bind(R.id.user_number_of_following_textview)
+//    TextView mUserNumberOfFollowingTextView;
+//
+//    @Bind(R.id.user_location_icon_imageview)
+//    ImageView mUserLocationImageView;
+//
+//    @Bind(R.id.user_profile_nested_scroll_view)
+//    NestedScrollView mUserProfileNestedScrollView;
 
-    @Bind(R.id.user_profile_banner_image_view)
-    ImageView mUserProfileBannerImageView;
-
-    @Bind(R.id.user_profile_picture_imageview)
-    RoundedImageView mUserProfilePictureImageView;
-
-    @Bind(R.id.user_screen_name_textview)
-    TextView mUserScreenNameTextView;
-
-    @Bind(R.id.user_full_name_textview)
-    TextView mUserFullnameTextView;
-
-    @Bind(R.id.user_about_textview)
-    TextView mUserBioTextView;
-
-    @Bind(R.id.user_location_name_textview)
-    TextView mUserLocationTextView;
-
-    @Bind(R.id.user_number_of_followers_textview)
-    TextView mUserNumberOfFollowersTextView;
-
-    @Bind(R.id.user_number_of_following_textview)
-    TextView mUserNumberOfFollowingTextView;
-
-    @Bind(R.id.user_location_icon_imageview)
-    ImageView mUserLocationImageView;
-
-    @Bind(R.id.user_profile_nested_scroll_view)
-    NestedScrollView mUserProfileNestedScrollView;
-
-    @Bind(R.id.collapsing_toolbar)
-    CollapsingToolbarLayout mCollapsibleLayout;
+//    @Bind(R.id.collapsing_toolbar)
+//    CollapsingToolbarLayout mCollapsibleLayout;
 
     private User profileForUser;
 
@@ -79,7 +79,7 @@ public class UserProfileActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         // Setting up action bar
-        setSupportActionBar(mToolbar);
+        //setSupportActionBar(mToolbar);
 
         if (profileForUser == null) {
             profileForUser = getUserFromBundle();
@@ -87,15 +87,15 @@ public class UserProfileActivity extends AppCompatActivity {
 
         populatePageWithUserInfo(profileForUser);
 
-        mUserProfileNestedScrollView.setOnScrollChangeListener(new NestedScrollView.OnScrollChangeListener() {
-            @Override
-            public void onScrollChange(NestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
-                Log.d("USER_PROFILE", " scrollX: " + scrollX + " scrollY: " + scrollY + " oldScrollX: " + oldScrollX + " oldScrollY: " + oldScrollY);
-            }
-        });
+//        mUserProfileNestedScrollView.setOnScrollChangeListener(new NestedScrollView.OnScrollChangeListener() {
+//            @Override
+//            public void onScrollChange(NestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+//                Log.d("USER_PROFILE", " scrollX: " + scrollX + " scrollY: " + scrollY + " oldScrollX: " + oldScrollX + " oldScrollY: " + oldScrollY);
+//            }
+//        });
 
         ViewPager viewPager = (ViewPager) findViewById(R.id.user_generated_content_tabs);
-        viewPager.setAdapter(new UserProfilePagerAdapter(getSupportFragmentManager(), new TweetViewHolderEventListener() {
+        viewPager.setAdapter(new UserProfilePagerAdapter(getSupportFragmentManager(), profileForUser, new TweetViewHolderEventListener() {
 
             @Override
             public Tweet didPressReplyOnTweetWithId(Tweet tweet) {
@@ -118,6 +118,11 @@ public class UserProfileActivity extends AppCompatActivity {
             }
 
             @Override
+            public void didPressMediaAtIndex(int mediaIndex) {
+
+            }
+
+            @Override
             public void didSelectTweet(Tweet tweet) {
 
             }
@@ -130,32 +135,32 @@ public class UserProfileActivity extends AppCompatActivity {
 
     private void populatePageWithUserInfo(User profileForUser) {
 
-        if ( profileForUser != null && profileForUser.getProfileBannerImageURL()!=null) {
-            Log.d("DEBUG", "getProfileBannerImageURL:"+profileForUser.getProfileBannerImageURL());
-            Glide.with(this).load(profileForUser.getProfileBannerImageURL()).into(mUserProfileBannerImageView);
-        }
+//        if ( profileForUser != null && profileForUser.getProfileBannerImageURL()!=null) {
+//            Log.d("DEBUG", "getProfileBannerImageURL:"+profileForUser.getProfileBannerImageURL());
+//            Glide.with(this).load(profileForUser.getProfileBannerImageURL()).into(mUserProfileBannerImageView);
+//        }
 
-        if ( profileForUser != null && profileForUser.getUserProfilePictureURLString()!=null) {
-            Log.d("DEBUG", "getUserProfilePictureURLString:"+profileForUser.getUserProfilePictureURLString());
-            Glide.with(this).load(profileForUser.getUserProfilePictureURLString()).into(mUserProfilePictureImageView);
-        }
-
-        mUserFullnameTextView.setText(profileForUser.getFullName());
-        mUserScreenNameTextView.setText(profileForUser.getUserName());
-
-        mUserBioTextView.setText(profileForUser.getBio());
-
-        if (profileForUser.getLocation() == null || profileForUser.getLocation().length() == 0) {
-            mUserLocationImageView.setVisibility(View.GONE);
-            mUserLocationTextView.setVisibility(View.GONE);
-        } else {
-            mUserLocationImageView.setVisibility(View.VISIBLE);
-            mUserLocationTextView.setVisibility(View.VISIBLE);
-            mUserLocationTextView.setText(profileForUser.getLocation());
-        }
-
-        mUserNumberOfFollowersTextView.setText(profileForUser.getFollowersCount());
-        mUserNumberOfFollowingTextView.setText(profileForUser.getFriendsCount());
+//        if ( profileForUser != null && profileForUser.getUserProfilePictureURLString()!=null) {
+//            Log.d("DEBUG", "getUserProfilePictureURLString:"+profileForUser.getUserProfilePictureURLString());
+//            Glide.with(this).load(profileForUser.getUserProfilePictureURLString()).into(mUserProfilePictureImageView);
+//        }
+//
+//        mUserFullnameTextView.setText(profileForUser.getFullName());
+//        mUserScreenNameTextView.setText(profileForUser.getUserName());
+//
+//        mUserBioTextView.setText(profileForUser.getBio());
+//
+//        if (profileForUser.getLocation() == null || profileForUser.getLocation().length() == 0) {
+//            mUserLocationImageView.setVisibility(View.GONE);
+//            mUserLocationTextView.setVisibility(View.GONE);
+//        } else {
+//            mUserLocationImageView.setVisibility(View.VISIBLE);
+//            mUserLocationTextView.setVisibility(View.VISIBLE);
+//            mUserLocationTextView.setText(profileForUser.getLocation());
+//        }
+//
+//        mUserNumberOfFollowersTextView.setText(profileForUser.getFollowersCount());
+//        mUserNumberOfFollowingTextView.setText(profileForUser.getFriendsCount());
     }
 
     @Override

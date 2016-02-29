@@ -5,6 +5,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
 import design.semicolon.sillytwitter.activity.HomeActivity;
+import design.semicolon.sillytwitter.fragments.MentionsFragment;
 import design.semicolon.sillytwitter.fragments.TimelineFragment;
 import design.semicolon.sillytwitter.fragments.UserLikesFragment;
 import design.semicolon.sillytwitter.listerners.TweetViewHolderEventListener;
@@ -32,7 +33,7 @@ public class HomePagerAdapter extends FragmentPagerAdapter {
             return TimelineFragment.newInstance(tabTitles[position], this.mTweetViewHolderEventListener);
         }
 
-        return UserLikesFragment.newInstance(tabTitles[position], this.mTweetViewHolderEventListener);
+        return MentionsFragment.newInstance(tabTitles[position], this.mTweetViewHolderEventListener);
     }
 
     @Override

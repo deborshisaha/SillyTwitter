@@ -21,8 +21,11 @@ public class TwitterMedia extends Model implements Serializable {
 
     private MediaType mediaType;
 
-    @Column(name = "meadia_id", unique = true, index = true, onUniqueConflict = Column.ConflictAction.REPLACE)
-    private long imgId;
+    @Column(name = "uid", unique = true, index = true, onUniqueConflict = Column.ConflictAction.REPLACE)
+    private long uid;
+
+    @Column(name = "uidStr")
+    private String uidStr;
 
     @Column(name = "media_url")
     private String mediaUrl;
@@ -30,7 +33,7 @@ public class TwitterMedia extends Model implements Serializable {
     @Column(name = "type")
     private String type;
 
-    @Column(name = "Tweet")
+    @Column(name = "tweet", index = true)
     private Tweet tweet;
 
     @Column(name = "video_duration")
@@ -55,7 +58,7 @@ public class TwitterMedia extends Model implements Serializable {
         TwitterMedia media = new TwitterMedia();
 
         try {
-            media.imgId = twitterMediaObject.getLong("id");;
+            media.uid = twitterMediaObject.getLong("id");;
             media.mediaUrl = twitterMediaObject.getString("media_url");
             media.type = twitterMediaObject.getString("type");
 
@@ -170,6 +173,25 @@ public class TwitterMedia extends Model implements Serializable {
     public TwitterMedia() {
         super();
         this.mediaType = MediaType.MEDIA_TYPE_UNKNOWN;
+    }
+
+    public TwitterMedia saveIfNecessaryElseGetTwitterMedia() {
+        long rId = this.uid;
+        TwitterMedia existingTwitterMedia = new Select().from(TwitterMedia.class).where("uid = ?", rId).executeSingle();
+        if (existingTwitterMedia != null) {
+            return existingTwitterMedia;
+        } else {
+            this.save();
+            return this;
+        }
+    }
+
+    public long getUid() {
+        return uid;
+    }
+
+    public String getUidStr() {
+        return uidStr;
     }
 //
 //    protected TwitterMedia(Parcel in) {

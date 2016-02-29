@@ -13,4 +13,5 @@ public interface TweetViewHolderEventListener {
 
     public void didPressProfilePicture(Tweet tweet);
     public void didSelectTweet(Tweet tweet);
+    public void didPressMediaAtIndex(int mediaIndex);
 }

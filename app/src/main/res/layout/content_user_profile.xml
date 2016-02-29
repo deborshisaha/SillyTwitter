@@ -1,183 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:app="http://schemas.android.com/apk/res-auto"
+xmlns:tools="http://schemas.android.com/tools"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+android:background="#ffffff"
+android:layout_below="@+id/user_stats_container_view"
+android:orientation="vertical">
+
+<com.astuetz.PagerSlidingTabStrip
+    android:id="@+id/user_generated_content_tab_title"
+    app:pstsShouldExpand="true"
+    app:pstsTextAllCaps="true"
+    android:textSize="14sp"
+    android:background="#ffffff"
+    android:textColor="#55acee"
+    app:pstsDividerColor="#00000000"
+    app:pstsIndicatorColor="#55acee"
+    app:pstsUnderlineColor="#00000000"
+    app:pstsIndicatorHeight = "2dp"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    app:behavior_overlapTop="37dp"
-    android:id="@+id/user_profile_nested_scroll_view"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context=".activity.UserProfileActivity"
-    tools:showIn="@layout/activity_user_profile">
+    android:layout_height="48dp" />
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:paddingLeft="10dp">
+<android.support.v4.view.ViewPager
+    android:id="@+id/user_generated_content_tabs"
+    android:background="#ffffff"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
-        <com.makeramen.roundedimageview.RoundedImageView
-            xmlns:app="http://schemas.android.com/apk/res-auto"
-            android:id="@+id/user_profile_picture_imageview"
-            android:layout_width="74dp"
-            android:layout_height="74dp"
-            android:layout_marginLeft="5dp"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
+</android.support.v4.view.ViewPager>
 
-            app:riv_corner_radius="10dp"
-            app:riv_border_width="2dp"
-            app:riv_border_color="#FFFFFF"
-            app:riv_mutate_background="true"  />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:layout_marginLeft="5dp"
-            android:layout_below="@+id/user_profile_picture_imageview"
-            android:textColor="@color/black_color"
-            android:id="@+id/user_full_name_textview"/>
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="14sp"
-            android:layout_marginLeft="5dp"
-            android:layout_marginBottom="5dp"
-            android:layout_below="@+id/user_full_name_textview"
-            android:id="@+id/user_screen_name_textview"/>
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="16sp"
-            android:layout_marginLeft="5dp"
-            android:layout_marginTop="5dp"
-            android:layout_marginBottom="5dp"
-            android:text="Blah blah"
-            android:layout_below="@+id/user_screen_name_textview"
-            android:id="@+id/user_about_textview"/>
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:layout_marginLeft="5dp"
-            android:layout_marginBottom="5dp"
-            android:layout_below="@id/user_about_textview"
-            android:id="@+id/user_location_container_view">
-
-            <ImageView
-                android:layout_width="14dp"
-                android:layout_height="14dp"
-                android:src="@drawable/ic_marker"
-                android:id="@+id/user_location_icon_imageview"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="5dp"
-                android:layout_alignTop="@+id/user_location_icon_imageview"
-                android:layout_toRightOf="@+id/user_location_icon_imageview"
-                android:text="San Francisco"
-                android:id="@+id/user_location_name_textview"/>
-
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:layout_marginLeft="5dp"
-            android:layout_marginBottom="5dp"
-            android:layout_below="@id/user_location_container_view"
-            android:id="@+id/user_stats_container_view">
-
-            <RelativeLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="25dp"
-                android:id="@+id/user_number_of_followers_container_view">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_message"
-                    android:textStyle="bold"
-                    android:text="38"
-                    android:textColor="@color/black_color"
-                    android:id="@+id/user_number_of_followers_textview"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="5dp"
-                    android:layout_toRightOf="@+id/user_number_of_followers_textview"
-                    android:text="FOLLOWERS"
-                    android:textColor="@color/light_gray"/>
-
-            </RelativeLayout>
-
-            <RelativeLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_toRightOf="@+id/user_number_of_followers_container_view"
-                android:id="@+id/user_number_of_following_container_view">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textStyle="bold"
-                    android:text="78"
-                    android:textColor="@color/black_color"
-                    android:id="@+id/user_number_of_following_textview"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="5dp"
-                    android:layout_toRightOf="@+id/user_number_of_following_textview"
-                    android:text="FOLLOWING"
-                    android:textColor="@color/light_gray" />
-
-            </RelativeLayout>
-
-        </RelativeLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="#ffffff"
-            android:layout_below="@+id/user_stats_container_view"
-            android:orientation="vertical">
-
-            <com.astuetz.PagerSlidingTabStrip
-                android:id="@+id/user_generated_content_tab_title"
-                app:pstsShouldExpand="true"
-                app:pstsTextAllCaps="true"
-                android:textSize="14sp"
-                android:background="#ffffff"
-                android:textColor="#55acee"
-                app:pstsDividerColor="#00000000"
-                app:pstsIndicatorColor="#55acee"
-                app:pstsUnderlineColor="#00000000"
-                app:pstsIndicatorHeight = "2dp"
-                android:layout_width="match_parent"
-                android:layout_height="48dp" />
-
-            <android.support.v4.view.ViewPager
-                android:id="@+id/user_generated_content_tabs"
-                android:background="#ffffff"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-            </android.support.v4.view.ViewPager>
-
-        </LinearLayout>
-
-    </RelativeLayout>
-
-</android.support.v4.widget.NestedScrollView>
+</LinearLayout>

@@ -23,6 +23,7 @@ import design.semicolon.sillytwitter.dao.TweetDao;
 import design.semicolon.sillytwitter.dao.TweetDaoImpl;
 import design.semicolon.sillytwitter.dao.UserDaoImpl;
 import design.semicolon.sillytwitter.exceptions.NoNetworkConnectionException;
+import design.semicolon.sillytwitter.listerners.EndlessRecyclerViewScrollListener;
 import design.semicolon.sillytwitter.listerners.OnTweetsLoadedListener;
 import design.semicolon.sillytwitter.listerners.OnUsersLoadedListener;
 import design.semicolon.sillytwitter.listerners.TweetViewHolderEventListener;
@@ -31,24 +32,24 @@ import design.semicolon.sillytwitter.models.User;
 
 public class UserLikesFragment extends Fragment {
 
-//    @Bind(R.id.user_likes_recyclerview)
-//    RecyclerView mUserLikesRecyclerView;
+    @Bind(R.id.user_likes_recyclerview)
+    RecyclerView mUserLikesRecyclerView;
 
+    private TweetViewHolderEventListener mTweetViewHolderEventListener;
     private OnTweetsLoadedListener mOnTweetsLoadedListener;
-    private TweetDaoImpl mUserLikedTweetDaoImpl;
-    private UserDaoImpl mUserDaoImpl;
-    private TweetsAdapter mUserLikedTweetsAdapter;
+    private TweetDaoImpl mTweetDaoImpl;
+    private TweetsAdapter mTweetAdapter;
     private LinearLayoutManager mLinearLayoutManager;
-    private User mCurrentUser;
+    private User mUser;
+    private boolean loading = true;
 
     public void setTweetViewHolderEventListener(TweetViewHolderEventListener mTweetViewHolderEventListener) {
         this.mTweetViewHolderEventListener = mTweetViewHolderEventListener;
     }
 
-    private TweetViewHolderEventListener mTweetViewHolderEventListener;
-
-    public static UserLikesFragment newInstance(String tabTitle, TweetViewHolderEventListener mTweetViewHolderEventListener) {
+    public static UserLikesFragment newInstance(String tabTitle, User user, TweetViewHolderEventListener mTweetViewHolderEventListener) {
         UserLikesFragment fragment = new UserLikesFragment();
+        fragment.mUser = user;
         fragment.setTweetViewHolderEventListener(mTweetViewHolderEventListener);
         return fragment;
     }
@@ -61,89 +62,94 @@ public class UserLikesFragment extends Fragment {
         ButterKnife.bind(this, view);
 
         // Initialize the adapter
-        mUserLikedTweetsAdapter = new TweetsAdapter(getContext(), this.mTweetViewHolderEventListener);
+        mTweetAdapter = new TweetsAdapter(getContext(), this.mTweetViewHolderEventListener);
 
         // Set the layout manager
-        mLinearLayoutManager = new LinearLayoutManager(getContext());
-        // mUserLikesRecyclerView.setLayoutManager(mLinearLayoutManager);
+        mLinearLayoutManager = new LinearLayoutManager(getActivity());
+        mUserLikesRecyclerView.setLayoutManager(mLinearLayoutManager);
 
         // Set adapter
-        // mUserLikesRecyclerView.setAdapter(mUserLikedTweetsAdapter);
+        mUserLikesRecyclerView.setAdapter(mTweetAdapter);
 
         // Listener listening to data load
         mOnTweetsLoadedListener = new OnTweetsLoadedListener() {
+
             @Override
-            public void onTweetsLoaded(List<Tweet> tweets, boolean cached) {
-                Log.d("UserLikesFragment", "User liked Tweets count: "+tweets.size());
+            public void moreRecentTweetsLoaded(List<Tweet> tweets, boolean cached) {
+
+                loading = false;
+
                 if (tweets != null) {
-                    mUserLikedTweetsAdapter.addTweets(tweets);
-                    mUserLikedTweetsAdapter.notifyDataSetChanged();
+                    // get current adapter size
+                    int curSize = mTweetAdapter.getItemCount();
+
+                    // Add results at the front
+                    int itemsAdded = mTweetAdapter.addToFrontOfTheList(tweets);
+
+                    mTweetAdapter.notifyItemRangeInserted(0, itemsAdded);
                 }
+            }
+
+            @Override
+            public void olderTweetsLoaded(List<Tweet> tweets, boolean cached) {
+
+                loading = false;
+
+                if (tweets != null) {
+
+                    // get current adapter size
+                    int curSize = mTweetAdapter.getItemCount();
+
+                    // Add to adapters
+                    mTweetAdapter.addTweets(tweets);
+
+                    mTweetAdapter.notifyItemRangeInserted(curSize, mTweetAdapter.getItemCount() - 1);
+                }
+            }
+
+            @Override
+            public void onTweetsLoadFailure(List<Tweet> tweets, boolean cached) {
+
             }
         };
 
-        if (mUserLikedTweetDaoImpl == null) {
-            mUserLikedTweetDaoImpl = new TweetDaoImpl(getContext());
+        // Initialize
+        if (mTweetDaoImpl == null) {
+            mTweetDaoImpl = new TweetDaoImpl(getContext());
         }
 
-        if (mUserDaoImpl == null) {
-            mUserDaoImpl = new UserDaoImpl();
-        }
-
-        mCurrentUser = User.currentUser(getContext());
-
-        // Check if the user is logged in
-        if (mCurrentUser != null) {
-            // Logged in, fetch mentions
-            getUserLikes();
-        } else {
-            // Fetch the user, then get mentions
+        if (this.mUser != null ) {
             try {
-                /* Silently load user */
-                mUserDaoImpl.reloadUser(getActivity(), new OnUsersLoadedListener() {
-                    @Override
-                    public void onCurrentUserLoaded(Context context, OnUsersLoadedListener onUsersLoadedListener) {
-                        getUserLikes();
-                    }
-                });
+                long since_id = 0;
+                mTweetDaoImpl.fetchUserLikedTweets(getContext(), mUser, since_id, 0, mOnTweetsLoadedListener, TweetDao.CachingStrategy.CacheThenNetwork);
             } catch (NoNetworkConnectionException e) {
-                Toast.makeText(getActivity(), e.getReason() + ' ' + e.getRemedy(), Toast.LENGTH_LONG).show();
-            }
-        }
-
-        /*
-        try {
-            mUserLikedTweetDaoImpl.fetchUserLikedTweets(getActivity(), 1, 0, mOnTweetsLoadedListener, TweetDao.CachingStrategy.CacheOnly);
-        } catch (NoNetworkConnectionException e) {
-            Toast.makeText(getActivity(), e.getReason() + ' ' + e.getRemedy(), Toast.LENGTH_LONG).show();
-        }
-
-        try {
-            mUserDaoImpl.reloadUser(getActivity(), null);
-        } catch (NoNetworkConnectionException e) {
-            Toast.makeText(getActivity(), e.getReason() + ' ' + e.getRemedy(), Toast.LENGTH_LONG).show();
-        }
-
-
-        mUserLikesRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-
-            @Override
-            public void onScrollStateChanged(RecyclerView recyclerView, int scrollState) {
-                super.onScrollStateChanged(recyclerView, scrollState);
+                Toast.makeText(getContext(), e.getReason() + ' ' + e.getRemedy(), Toast.LENGTH_LONG).show();
             }
 
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-            }
-        });
-*/
+            mUserLikesRecyclerView.addOnScrollListener(new EndlessRecyclerViewScrollListener(mLinearLayoutManager) {
+                @Override
+                public void onLoadMore(int page, int totalItemsCount) {
+
+                    Tweet tweetLast = mTweetAdapter.getLastTweet();
+
+                    if (tweetLast != null) {
+                        long maxIdInTheAdapter = tweetLast.getUid();
+                        try {
+                            mTweetDaoImpl.fetchUserLikedTweets(getContext(),  mUser, 0, maxIdInTheAdapter - 1, mOnTweetsLoadedListener, TweetDao.CachingStrategy.CacheThenNetwork);
+                        } catch (NoNetworkConnectionException e) {
+                            Toast.makeText(getActivity(), e.getReason() + ' ' + e.getRemedy(), Toast.LENGTH_LONG).show();
+                        }
+                    }
+                }
+            });
+        }
+
         return view;
     }
 
     public void getUserLikes() {
         try {
-            mUserLikedTweetDaoImpl.fetchUserLikedTweets(getActivity(), 1, 0, mOnTweetsLoadedListener, TweetDao.CachingStrategy.CacheOnly);
+            mTweetDaoImpl.fetchUserLikedTweets(getActivity(), 1, 0, mOnTweetsLoadedListener, TweetDao.CachingStrategy.CacheOnly);
         } catch (NoNetworkConnectionException e) {
             Toast.makeText(getActivity(), e.getReason() + ' ' + e.getRemedy(), Toast.LENGTH_LONG).show();
         }

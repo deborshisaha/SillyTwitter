@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import com.volokh.danylo.visibility_utils.items.ListItem;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -46,7 +47,9 @@ public class TweetsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         this.mTweetViewHolderEventListener = tweetViewHolderEventListener;
     }
 
-    public void addTweets(List<Tweet> tweets) {
+    public int addTweets(List<Tweet> tweets) {
+
+        int itemsAdded = 0;
 
         if (mTweets == null) {
             mTweets = new ArrayList<Tweet>();
@@ -59,12 +62,14 @@ public class TweetsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                 Log.d("DEBUG", "Adding tweet:"+tweet.getUidStr());
                 mTweetInRecyclerViewMap.put(tweet.getUidStr().toString(), true);
                 mTweets.add(tweet);
+                itemsAdded++;
             } else {
                 Log.d("DEBUG", "Not Adding tweet:"+tweet.getUidStr()+" content:"+tweet.getText());
             }
         }
 
         Log.d("DEBUG", "Number of tweets:"+mTweets.size());
+        return itemsAdded;
     }
 
     public void clearTweets() {
@@ -135,9 +140,8 @@ public class TweetsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
         int numberOfMedias = 0;
 
-        if (tweet!=null && tweet.getTwitterMedias() != null) {
-            Log.d("DEBUG", "Media size:"+tweet.getUid()+ ":"+tweet.getTwitterMedias().size());
-            numberOfMedias = tweet.getTwitterMedias().size();
+        if (tweet!=null && tweet.allMedia() != null) {
+            numberOfMedias = tweet.allMedia().size();
         }
 
         if (numberOfMedias > 0 && tweet.hasVideo()) {
@@ -168,11 +172,20 @@ public class TweetsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         }
     }
 
+    public Tweet getMostRecentTweet() {
+
+        if (mTweets != null && mTweets.size() != 0) {
+            return mTweets.get(0);
+        }
+        return null;
+    }
+
     public Tweet getLastTweet() {
 
-        if (mTweets.size() != 0) {
+        if (mTweets != null && mTweets.size() != 0) {
             return mTweets.get(mTweets.size() - 1);
         }
+
         return null;
     }
 
@@ -183,5 +196,13 @@ public class TweetsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         }
 
         return null;
+    }
+
+    public int addToFrontOfTheList(List<Tweet> tweets) {
+
+        Collections.reverse(mTweets);
+        int itemsAdded = addTweets(mTweets);
+        Collections.reverse(mTweets);
+        return itemsAdded;
     }
 }

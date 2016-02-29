@@ -5,6 +5,7 @@ import android.view.View;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
+import com.makeramen.roundedimageview.RoundedImageView;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -28,7 +29,7 @@ public class TweetWithOneImageViewHolder extends TweetViewHolder {
         String tweetMediaURLString = tweet.getFirstImageURL();
 
         if (tweetMediaURLString != null){
-            Glide.with(context).load(tweetMediaURLString+":medium").placeholder(R.drawable.placeholder_medium).into(image_one_imageview);
+            Glide.with(context).load(tweetMediaURLString).placeholder(R.drawable.placeholder_medium).into(image_one_imageview);
         }
     }
 }

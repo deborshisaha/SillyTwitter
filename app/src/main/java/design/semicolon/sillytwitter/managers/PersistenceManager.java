@@ -16,15 +16,25 @@ import design.semicolon.sillytwitter.models.User;
  */
 public class PersistenceManager {
 
-    public static boolean fetchCachedTimelineTweets( TweetDao.CachingStrategy cachingStrategy, OnTweetsLoadedListener onTweetsLoadedListener) {
-
-        if (cachingStrategy == TweetDao.CachingStrategy.CacheOnly || cachingStrategy == TweetDao.CachingStrategy.CacheThenNetwork) {
-            onTweetsLoadedListener.onTweetsLoaded(Tweet.all(), true);
-        }
-
-        return (cachingStrategy == TweetDao.CachingStrategy.CacheOnly);
+    public static void fetchCachedTimelineTweets( OnTweetsLoadedListener onTweetsLoadedListener) {
+        List<Tweet> tweets = Tweet.all();
+        onTweetsLoadedListener.olderTweetsLoaded(tweets, true);
     }
 
+    public static void fetchCachedMentions( String screenName, OnTweetsLoadedListener onTweetsLoadedListener) {
+        List<Tweet> tweets = Tweet.getTweetsUserWasMentioned();
+        onTweetsLoadedListener.olderTweetsLoaded(tweets, true);
+    }
+
+    public static void fetchCachedUserTimeLineTweets(User user, OnTweetsLoadedListener onTweetsLoadedListener) {
+        List<Tweet> tweets = user.allTweets();
+        onTweetsLoadedListener.olderTweetsLoaded(tweets, true);
+    }
+
+    public static void fetchCachedUserLikedTweets(User user, OnTweetsLoadedListener onTweetsLoadedListener) {
+        List<Tweet> tweets = user.favorites();
+        onTweetsLoadedListener.olderTweetsLoaded(tweets, true);
+    }
     /**
      * Persist all contents of the tweet
      */
@@ -55,7 +65,7 @@ public class PersistenceManager {
     public static boolean fetchUserMentionedTweets(TweetDao.CachingStrategy cachingStrategy, OnTweetsLoadedListener onTweetsLoadedListener) {
 
         if (cachingStrategy == TweetDao.CachingStrategy.CacheOnly || cachingStrategy == TweetDao.CachingStrategy.CacheThenNetwork) {
-            onTweetsLoadedListener.onTweetsLoaded(Tweet.getTweetsUserWasMentioned(), true);
+            //onTweetsLoadedListener.onTweetsLoadSuccess(Tweet.getTweetsUserWasMentioned(), true);
         }
 
         return (cachingStrategy == TweetDao.CachingStrategy.CacheOnly);

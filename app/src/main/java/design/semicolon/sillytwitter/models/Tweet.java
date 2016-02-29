@@ -14,6 +14,7 @@ import com.activeandroid.query.Select;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.io.Serializable;
 import java.sql.Date;
@@ -73,18 +74,24 @@ public class Tweet extends Model implements Serializable {
         return user;
     }
 
-    public List<TwitterMedia> getTwitterMedias() {
+    public List<TwitterMedia> allMedia() {
+
+        List<TwitterMedia> mediaList = TwitterMedia.all();
+
+        for (TwitterMedia media:mediaList) {
+            Log.d("DEBUG", media.getUid()+":"+media.getTweet()+":"+media.getTweet().getUid());
+        }
 
         if (twitterMedias == null){
 
-            twitterMedias= new ArrayList<TwitterMedia>();
+            Tweet tweet = new Select()
+                    .from(Tweet.class)
+                    .where("uid= ?", this.uid)
+                    .executeSingle();
 
-            List<TwitterMedia> medias = null;
-
-            //getMany(TwitterMedia.class, "Tweet");
-
-            if (medias != null) {
-                twitterMedias.addAll(medias);
+            if (tweet != null && tweet.getId() != 0) {
+                Log.d("DEBUG", tweet.getId()+":IN IN");
+                twitterMedias = new Select().from(TwitterMedia.class).where("tweet = ?", tweet.getId()).execute();
             }
         }
 
@@ -193,6 +200,7 @@ public class Tweet extends Model implements Serializable {
         return false;
     }
 
+
     public void persistMedia () {
 
         if (twitterMedias == null) {return;}
@@ -281,6 +289,23 @@ public class Tweet extends Model implements Serializable {
         return new Select().from(Tweet.class).where("user_mentioned = ?", true).orderBy("timestamp DESC").executeSingle();
     }
 
+//    public static List<Tweet> tweetsByUser(User user) {
+//
+//        User tempUser = null;
+//        Log.d("DEBUG", "user.getId(): "+user.getId());
+//        if (user.getId() == null) {
+//            tempUser = User.getUserWithScreenName(user);
+//        } else {
+//            tempUser = user;
+//        }
+//
+//        if (tempUser.getUid() != 0 ) {
+//            return new Select().from(Tweet.class).where("user = ?", tempUser.getId()).orderBy("timestamp DESC").execute();
+//        }
+//
+//        return null;
+//    }
+
     public void setUser(User user) {
         this.user = user;
     }
@@ -319,4 +344,20 @@ public class Tweet extends Model implements Serializable {
     public boolean isRetweetedByUser() {
         return this.retweeted;
     }
+
+    public Tweet saveIfNecessaryElseGetTweet() {
+        long rId = this.uid;
+        Tweet existingTweet = new Select().from(Tweet.class).where("uid = ?", rId).executeSingle();
+        if (existingTweet != null) {
+            return existingTweet;
+        } else {
+            this.save();
+            return this;
+        }
+    }
+
+    public List<Tweet> allAfterMaxId(long max_id) {
+        return new Select().from(Tweet.class).where("uid < ?", max_id).orderBy("timestamp DESC").execute();
+    }
+
 }

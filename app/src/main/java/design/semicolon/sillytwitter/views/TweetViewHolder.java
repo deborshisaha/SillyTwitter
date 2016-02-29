@@ -1,6 +1,7 @@
 package design.semicolon.sillytwitter.views;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
@@ -95,7 +96,8 @@ public class TweetViewHolder extends RecyclerView.ViewHolder {
         this.favorite_count_textview.setText(tweet.getFavoriteCount());
 
         if (tweet.getUser().getUserProfilePictureURLString() != null) {
-            Glide.with(context).load(tweet.getUser().getUserProfilePictureURLString()).diskCacheStrategy(DiskCacheStrategy.ALL).placeholder(R.drawable.placeholder).into(user_profile_picture_imageview);
+            Log.d("TweetViewHolder", tweet.getUser().getUserProfilePictureURLString() );
+            Glide.with(context).load(tweet.getUser().getUserProfilePictureURLString()).diskCacheStrategy(DiskCacheStrategy.ALL).into(user_profile_picture_imageview);
         }
 
         if (tweet.getRetweetAuthorName() == null || tweet.getRetweetAuthorName().length() == 0 ) {

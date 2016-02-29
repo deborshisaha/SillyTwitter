@@ -1,9 +1,11 @@
 package design.semicolon.sillytwitter.restclient;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.codepath.oauth.OAuthBaseClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 import org.scribe.builder.api.Api;
 import org.scribe.builder.api.TwitterApi;
@@ -26,6 +28,8 @@ public class SillyTwitterClient extends OAuthBaseClient {
         String urlString = getApiUrl("statuses/home_timeline.json");
         RequestParams params = new RequestParams();
 
+        Log.d("SillyTwitterClient", "count: " + count + "since_id: "+since_id + "max_id: "+max_id);
+
         if (count != 0) {
             params.put("count", count);
         }
@@ -35,7 +39,57 @@ public class SillyTwitterClient extends OAuthBaseClient {
         }
 
         if (max_id != 0) {
-            params.put("max_id", max_id - 1);
+            params.put("max_id", max_id);
+        }
+
+        getClient().get(urlString, params, handler);
+    }
+
+    public void getUserTimelineTweets(int fetchCount, long user_id, long since_id, long max_id, AsyncHttpResponseHandler handler) {
+        String urlString = getApiUrl("statuses/user_timeline.json");
+        RequestParams params = new RequestParams();
+
+        Log.d("SillyTwitterClient", "count: " + fetchCount + "since_id: "+since_id + "max_id: "+max_id);
+
+        if (user_id != 0) {
+            params.put("user_id", user_id);
+        }
+
+        if (fetchCount != 0) {
+            params.put("count", fetchCount);
+        }
+
+        if (since_id != 0) {
+            params.put("since_id", since_id);
+        }
+
+        if (max_id != 0) {
+            params.put("max_id", max_id);
+        }
+
+        getClient().get(urlString, params, handler);
+    }
+
+    public void getUserLikedTweets(int fetchCount, long user_id, long since_id, long max_id, AsyncHttpResponseHandler handler) {
+        String urlString = getApiUrl("favorites/list.json");
+        RequestParams params = new RequestParams();
+
+        Log.d("SillyTwitterClient", "count: " + fetchCount + "since_id: "+since_id + "max_id: "+max_id);
+
+        if (user_id != 0) {
+            params.put("user_id", user_id);
+        }
+
+        if (fetchCount != 0) {
+            params.put("count", fetchCount);
+        }
+
+        if (since_id != 0) {
+            params.put("since_id", since_id);
+        }
+
+        if (max_id != 0) {
+            params.put("max_id", max_id);
         }
 
         getClient().get(urlString, params, handler);
@@ -71,7 +125,7 @@ public class SillyTwitterClient extends OAuthBaseClient {
     }
 
     public void getUserMentions(int count, long since_id, long max_id, AsyncHttpResponseHandler handler) {
-        String urlString = getApiUrl("statuses/home_timeline.json");
+        String urlString = getApiUrl("statuses/mentions_timeline.json");
         RequestParams params = new RequestParams();
 
         if (count != 0) {
@@ -98,4 +152,6 @@ public class SillyTwitterClient extends OAuthBaseClient {
         String apiUrl = getApiUrl("statuses/unretweet/"+uid+".json");
         getClient().get(apiUrl, handler);
     }
+
+
 }

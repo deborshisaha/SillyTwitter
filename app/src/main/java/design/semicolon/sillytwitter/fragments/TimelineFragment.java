@@ -6,6 +6,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,8 +24,10 @@ import design.semicolon.sillytwitter.dao.TweetDao;
 import design.semicolon.sillytwitter.dao.TweetDaoImpl;
 import design.semicolon.sillytwitter.dao.UserDaoImpl;
 import design.semicolon.sillytwitter.exceptions.NoNetworkConnectionException;
+import design.semicolon.sillytwitter.listerners.EndlessRecyclerViewScrollListener;
 import design.semicolon.sillytwitter.listerners.OnTweetsLoadedListener;
 import design.semicolon.sillytwitter.listerners.TweetViewHolderEventListener;
+import design.semicolon.sillytwitter.managers.PersistenceManager;
 import design.semicolon.sillytwitter.models.Tweet;
 
 public class TimelineFragment extends Fragment {
@@ -66,14 +69,49 @@ public class TimelineFragment extends Fragment {
         mOnTweetsLoadedListener = new OnTweetsLoadedListener() {
 
             @Override
-            public void onTweetsLoaded(List<Tweet> tweets, boolean cached) {
+            public void moreRecentTweetsLoaded(List<Tweet> tweets, boolean cached) {
+
                 loading = false;
-                swipeContainer.setRefreshing(false);
 
                 if (tweets != null) {
-                    mTweetAdapter.addTweets(tweets);
-                    mTweetAdapter.notifyDataSetChanged();
+                    // get current adapter size
+                    int curSize = mTweetAdapter.getItemCount();
+
+                    // Add results at the front
+                    int itemsAdded = mTweetAdapter.addToFrontOfTheList(tweets);
+
+                    // save the most recent tweet
+                    saveMostRecentTweetId();
+
+                    mTweetAdapter.notifyItemRangeInserted(0, itemsAdded);
                 }
+            }
+
+            @Override
+            public void olderTweetsLoaded(List<Tweet> tweets, boolean cached) {
+
+                loading = false;
+
+                if (tweets != null) {
+
+                    // get current adapter size
+                    int curSize = mTweetAdapter.getItemCount();
+
+                    // Add to adapters
+                    mTweetAdapter.addTweets(tweets);
+
+                    // save the most recent tweet
+                    saveMostRecentTweetId();
+
+                    Log.d("DEBUG", "curSize:" + curSize + " Cached:" + cached);
+                    Log.d("DEBUG", "mTweetAdapter.getItemCount():"+mTweetAdapter.getItemCount() );
+                    mTweetAdapter.notifyItemRangeInserted(curSize, mTweetAdapter.getItemCount() - 1);
+                }
+            }
+
+            @Override
+            public void onTweetsLoadFailure(List<Tweet> tweets, boolean cached) {
+
             }
         };
 
@@ -89,111 +127,46 @@ public class TimelineFragment extends Fragment {
          * Load data on first load
          */
         try {
-            mTweetDaoImpl.fetchTimelineTweets(getContext(), 1, 0, mOnTweetsLoadedListener, TweetDao.CachingStrategy.CacheOnly);
+            long since_id = 0;
+            mTweetDaoImpl.fetchHomeTimelineTweets(getContext(), since_id, 0, mOnTweetsLoadedListener,TweetDao.CachingStrategy.CacheThenNetwork);
         } catch (NoNetworkConnectionException e) {
             Toast.makeText(getActivity(), e.getReason() + ' ' + e.getRemedy(), Toast.LENGTH_LONG).show();
         }
 
         try {
-            /* Silent ly load data */
+            /* Silently load data */
             mUserDaoImpl.reloadUser(getActivity(), null);
         } catch (NoNetworkConnectionException e) {
             Toast.makeText(getActivity(), e.getReason() + ' ' + e.getRemedy(), Toast.LENGTH_LONG).show();
         }
 
-        /*
-        mTimelineRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-
+        mTimelineRecyclerView.addOnScrollListener(new EndlessRecyclerViewScrollListener(mLinearLayoutManager) {
             @Override
-            public void onScrollStateChanged(RecyclerView recyclerView, int scrollState) {
-                super.onScrollStateChanged(recyclerView, scrollState);
-            }
+            public void onLoadMore(int page, int totalItemsCount) {
 
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
+                Tweet tweetLast = mTweetAdapter.getLastTweet();
 
-                visibleItemCount = recyclerView.getChildCount();
-                totalItemCount = mLinearLayoutManager.getItemCount();
-                firstVisibleItem = mLinearLayoutManager.findFirstVisibleItemPosition();
-                lastVisibleItem = mLinearLayoutManager.findLastVisibleItemPosition();
+                if (tweetLast != null) {
+                    long maxIdInTheAdapter = tweetLast.getUid();
 
-                if (dy > 0) {
-
-                    if (!loading && ((visibleItemCount + firstVisibleItem) * 100 / totalItemCount) > 90) {
-                        loading = true;
-
-                        Tweet tweet = mTweetAdapter.getLastTweet();
-
-                        if (tweet != null) {
-                            long max_id = tweet.getUid();
-
-                            try {
-                                mTweetDaoImpl.fetchTimelineTweets(getActivity(), 0, max_id, mOnTweetsLoadedListener, TweetDao.CachingStrategy.CacheOnly);
-                            } catch (NoNetworkConnectionException e) {
-                                Toast.makeText(getActivity(), e.getReason() + ' ' + e.getRemedy(), Toast.LENGTH_LONG).show();
-                            }
-                        }
+                    try {
+                        mTweetDaoImpl.fetchHomeTimelineTweets(getContext(), 0, maxIdInTheAdapter - 1, mOnTweetsLoadedListener,TweetDao.CachingStrategy.CacheThenNetwork);
+                    } catch (NoNetworkConnectionException e) {
+                        Toast.makeText(getActivity(), e.getReason() + ' ' + e.getRemedy(), Toast.LENGTH_LONG).show();
                     }
-                }
-            }
-        });
-
-
-        mTimelineRecyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
-
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-
-                // IF scrolling down
-                visibleItemCount = recyclerView.getChildCount();
-                totalItemCount = mLinearLayoutManager.getItemCount();
-                firstVisibleItem = mLinearLayoutManager.findFirstVisibleItemPosition();
-                lastVisibleItem = mLinearLayoutManager.findLastVisibleItemPosition();
-
-                Log.d("DEBUG", "visibleItemCount :"+visibleItemCount);
-                Log.d("DEBUG", "firstVisibleItem :"+firstVisibleItem);
-                Log.d("DEBUG", "firstCompletelyVisibleItem :"+ mLinearLayoutManager.findFirstCompletelyVisibleItemPosition());
-
-                Log.d("DEBUG", "dx :"+ dx + "dy :" + dy);
-
-                if (dy > 0) {
-
-                    if (!loading && ((visibleItemCount + firstVisibleItem)*100/totalItemCount) > 90) {
-                        loading = true;
-
-                        Tweet tweet = mTweetAdapter.getLastTweet();
-
-                        if (tweet != null) {
-                            long max_id = tweet.getUid();
-
-                            try {
-                                mTweetDaoImpl.fetchTimelineTweets(TimelineActivity.this, 0, max_id, mOnTweetsLoadedListener, TweetDao.CachingStrategy.CacheOnly);
-                            } catch (NoNetworkConnectionException e) {
-                                Toast.makeText(TimelineActivity.this, e.getReason() + ' ' + e.getRemedy(), Toast.LENGTH_LONG).show();
-                            }
-                        }
-                    }
-                }
-            }
-        });
-*/
-        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-
-            @Override
-            public void onRefresh() {
-
-                try {
-                    swipeContainer.setRefreshing(true);
-                    mTweetDaoImpl.fetchTimelineTweets(getActivity(), 1, 0, mOnTweetsLoadedListener, TweetDao.CachingStrategy.CacheOnly);
-                } catch (NoNetworkConnectionException e) {
-                    swipeContainer.setRefreshing(false);
-                    Toast.makeText(getActivity(), e.getReason() + ' ' + e.getRemedy(), Toast.LENGTH_LONG).show();
                 }
             }
         });
 
         return view;
+    }
+
+    private void  saveMostRecentTweetId () {
+        Tweet tweet = (Tweet) mTweetAdapter.getMostRecentTweet();
+        if (tweet != null) {
+            Log.d("TIMELINE_FRAGMENT", "Newest Tweet in timeline:"+tweet.getUid());
+            TweetDaoImpl.setNewestTweetInTimeLineId(getContext(), tweet.getUid());
+        }
     }
 
     public void setHomeActivityEventListener(TweetViewHolderEventListener tweetViewHolderEventListener) {

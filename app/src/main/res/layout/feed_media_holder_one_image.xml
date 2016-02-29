@@ -5,6 +5,7 @@
     android:weightSum="10"
     android:background="@color/black_color"
     android:layout_height="match_parent">
+
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -12,4 +13,5 @@
         android:adjustViewBounds="true"
         android:layout_weight="10"
         android:id="@+id/image_one_imageview"/>
+
 </LinearLayout>

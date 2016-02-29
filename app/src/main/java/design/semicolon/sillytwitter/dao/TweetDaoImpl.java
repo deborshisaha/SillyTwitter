@@ -51,6 +51,150 @@ public class TweetDaoImpl implements TweetDao {
     public TweetDaoImpl() { super();}
 
     @Override
+    public  void fetchHomeTimelineTweets(Context context, final long since_id, final long max_id, final OnTweetsLoadedListener onTweetsLoadedListener, CachingStrategy cachingStrategy) throws NoNetworkConnectionException {
+
+        if (CachingStrategy.CacheThenNetwork == cachingStrategy || cachingStrategy == TweetDao.CachingStrategy.CacheOnly) {
+            PersistenceManager.fetchCachedTimelineTweets(onTweetsLoadedListener);
+        }
+
+        if (CachingStrategy.CacheOnly == cachingStrategy ) {
+            return;
+        }
+
+        if ( !NetworkConnectivityManager.isConnectedToInternet(context)) {
+            throw new NoNetworkConnectionException();
+        }
+
+        SillyTwitterApplication.getRestClient().getHomeTimeLine(getFetchCount(context), since_id, max_id, new JsonHttpResponseHandler() {
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONArray json) {
+                super.onSuccess(statusCode, headers, json);
+
+                List<Tweet> tweets = getArrayOfTweetObjects(json, true);
+                PersistenceManager.persistTweets(tweets);
+
+                if (since_id != 0) {
+                    // More recent tweets were inserted
+                    onTweetsLoadedListener.moreRecentTweetsLoaded(tweets, false);
+                } else {
+                    // older Tweets are inserted
+                    onTweetsLoadedListener.olderTweetsLoaded(tweets, false);
+                }
+
+                //onTweetsLoadedListener.onTweetsLoadSuccess(tweets, false);
+            }
+        });
+    }
+
+    public  void fetchMentions(Context context, String screenName, final long since_id, final long max_id, final OnTweetsLoadedListener onTweetsLoadedListener, CachingStrategy cachingStrategy) throws NoNetworkConnectionException {
+
+        if (CachingStrategy.CacheThenNetwork == cachingStrategy || cachingStrategy == TweetDao.CachingStrategy.CacheOnly) {
+            PersistenceManager.fetchCachedMentions(screenName, onTweetsLoadedListener);
+        }
+
+        if (CachingStrategy.CacheOnly == cachingStrategy ) {
+            return;
+        }
+
+        if ( !NetworkConnectivityManager.isConnectedToInternet(context)) {
+            throw new NoNetworkConnectionException();
+        }
+
+        SillyTwitterApplication.getRestClient().getUserMentions(getFetchCount(context), since_id, max_id, new JsonHttpResponseHandler() {
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONArray json) {
+                super.onSuccess(statusCode, headers, json);
+
+                List<Tweet> tweets = getArrayOfTweetObjects(json, true);
+                PersistenceManager.persistTweets(tweets);
+
+                if (since_id != 0) {
+                    // More recent tweets were inserted
+                    onTweetsLoadedListener.moreRecentTweetsLoaded(tweets, false);
+                } else {
+                    // older Tweets are inserted
+                    onTweetsLoadedListener.olderTweetsLoaded(tweets, false);
+                }
+            }
+        });
+
+    }
+
+    public  void fetchUserTimeLineTweets(Context context, User user, final long since_id, final long max_id, final OnTweetsLoadedListener onTweetsLoadedListener, CachingStrategy cachingStrategy) throws NoNetworkConnectionException {
+
+        if (CachingStrategy.CacheThenNetwork == cachingStrategy || cachingStrategy == TweetDao.CachingStrategy.CacheOnly) {
+            PersistenceManager.fetchCachedUserTimeLineTweets(user, onTweetsLoadedListener);
+        }
+
+        if (CachingStrategy.CacheOnly == cachingStrategy ) {
+            return;
+        }
+
+        if ( !NetworkConnectivityManager.isConnectedToInternet(context)) {
+            throw new NoNetworkConnectionException();
+        }
+
+        SillyTwitterApplication.getRestClient().getUserTimelineTweets(getFetchCount(context), user.getUid(), since_id, max_id, new JsonHttpResponseHandler() {
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONArray json) {
+                super.onSuccess(statusCode, headers, json);
+
+                List<Tweet> tweets = getArrayOfTweetObjects(json, true);
+                PersistenceManager.persistTweets(tweets);
+
+                if (since_id != 0) {
+                    // More recent tweets were inserted
+                    onTweetsLoadedListener.moreRecentTweetsLoaded(tweets, false);
+                } else {
+                    // older Tweets are inserted
+                    onTweetsLoadedListener.olderTweetsLoaded(tweets, false);
+                }
+            }
+        });
+    }
+
+    public  void fetchUserLikedTweets(Context context, User user, final long since_id, final long max_id, final OnTweetsLoadedListener onTweetsLoadedListener, CachingStrategy cachingStrategy) throws NoNetworkConnectionException {
+
+        if (CachingStrategy.CacheThenNetwork == cachingStrategy || cachingStrategy == TweetDao.CachingStrategy.CacheOnly) {
+
+            if (User.currentUser(context).getUserName().equals(user.getUserName())) {
+                PersistenceManager.fetchCachedUserLikedTweets(user, onTweetsLoadedListener);
+            }
+        }
+
+        if (CachingStrategy.CacheOnly == cachingStrategy ) {
+            return;
+        }
+
+        if ( !NetworkConnectivityManager.isConnectedToInternet(context)) {
+            throw new NoNetworkConnectionException();
+        }
+
+        SillyTwitterApplication.getRestClient().getUserLikedTweets(getFetchCount(context), user.getUid(), since_id, max_id, new JsonHttpResponseHandler() {
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONArray json) {
+                super.onSuccess(statusCode, headers, json);
+
+                List<Tweet> tweets = getArrayOfTweetObjects(json, true);
+                PersistenceManager.persistTweets(tweets);
+
+                if (since_id != 0) {
+                    // More recent tweets were inserted
+                    onTweetsLoadedListener.moreRecentTweetsLoaded(tweets, false);
+                } else {
+                    // older Tweets are inserted
+                    onTweetsLoadedListener.olderTweetsLoaded(tweets, false);
+                }
+            }
+        });
+    }
+
+
+    @Override
     public void fetchTimelineTweets(Context context,  long since_id, long max_id, final OnTweetsLoadedListener onTweetsLoadedListener, CachingStrategy cachingStrategy) throws NoNetworkConnectionException {
 
         ///////// Remove this ///////////
@@ -63,7 +207,7 @@ public class TweetDaoImpl implements TweetDao {
 
                 // TODO : Persist tweets uncomment
                 //PersistenceManager.persistTweets(mentionedTweets);
-                onTweetsLoadedListener.onTweetsLoaded(homeTimelineTweets, false);
+                //onTweetsLoadedListener.onTweetsLoadSuccess(homeTimelineTweets, false);
 
             } catch(Throwable t) {
                 t.printStackTrace();
@@ -74,9 +218,9 @@ public class TweetDaoImpl implements TweetDao {
         ///////// Remove this ///////////
 
         // Return true then fetch
-        if (PersistenceManager.fetchCachedTimelineTweets(cachingStrategy, onTweetsLoadedListener)) {
-            return;
-        }
+//        if (PersistenceManager.fetchCachedTimelineTweets(cachingStrategy, onTweetsLoadedListener)) {
+//            return;
+//        }
 
         // if we need to connect to network, check if connected to internet
         if ( !NetworkConnectivityManager.isConnectedToInternet(context)) {
@@ -91,22 +235,7 @@ public class TweetDaoImpl implements TweetDao {
                 super.onSuccess(statusCode, headers, json);
                 List<Tweet> mentionedTweets = getArrayOfTweetObjects(json, true);
                 PersistenceManager.persistTweets(mentionedTweets);
-                onTweetsLoadedListener.onTweetsLoaded(Tweet.all(), false);
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                super.onFailure(statusCode, headers, throwable, errorResponse);
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
-                super.onFailure(statusCode, headers, throwable, errorResponse);
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                super.onFailure(statusCode, headers, responseString, throwable);
+                //onTweetsLoadedListener.onTweetsLoadSuccess(Tweet.all(), false);
             }
 
         });
@@ -127,7 +256,7 @@ public class TweetDaoImpl implements TweetDao {
                 PersistenceManager.persistTweets(mentionedTweets);
 
                 List<Tweet> mentions = Tweet.getTweetsUserWasMentioned();
-                onTweetsLoadedListener.onTweetsLoaded(mentions, false);
+                //onTweetsLoadedListener.onTweetsLoadSuccess(mentionedTweets, false);
             } catch(Throwable t) {
                 t.printStackTrace();
             }
@@ -157,7 +286,7 @@ public class TweetDaoImpl implements TweetDao {
                 super.onSuccess(statusCode, headers, json);
                 List<Tweet> mentionedTweets = getArrayOfTweetObjects(json, true);
                 PersistenceManager.persistTweets(mentionedTweets);
-                onTweetsLoadedListener.onTweetsLoaded(Tweet.getTweetsUserWasMentioned(), false);
+                //onTweetsLoadedListener.onTweetsLoadSuccess(Tweet.getTweetsUserWasMentioned(), false);
             }
 
             @Override
@@ -205,15 +334,15 @@ public class TweetDaoImpl implements TweetDao {
         return tweets;
     }
 
-    private static long getNewestTweetInTimeLineFetchedId(Context context) {
+    public static long getNewestTweetInTimeLineId(Context context) {
         return PreferenceManager.getDefaultSharedPreferences(context).getLong(NEWEST_TIMELINE_TWEET_ID, 0);
     }
 
-    private static void setNewestTweetInTimeLineFetchedId(Context context, long id) {
+    public static void setNewestTweetInTimeLineId(Context context, long id) {
         PreferenceManager.getDefaultSharedPreferences(context).edit().putLong(NEWEST_TIMELINE_TWEET_ID, id).apply();
     }
 
-    private static long getOldestTweetInTimeLineFetchedId(Context context) {
+    public static long getOldestTweetInTimeLineFetchedId(Context context) {
         return PreferenceManager.getDefaultSharedPreferences(context).getLong(OLDEST_TIMELINE_TWEET_ID, 0);
     }
 
@@ -304,8 +433,8 @@ public class TweetDaoImpl implements TweetDao {
                 String userLikedTweetsString = getStringFromRaw(context, R.raw.deborshisaha_user_liked_tweets);
                 JSONArray userLikedTweetsJSONArray = new JSONArray(userLikedTweetsString);
                 List<Tweet> userLikedTweets = getArrayOfTweetObjects(userLikedTweetsJSONArray, true);
-                //PersistenceManager.persistTweets(userLikedTweets);
-                onTweetsLoadedListener.onTweetsLoaded(userLikedTweets, false);
+                PersistenceManager.persistTweets(userLikedTweets);
+                //onTweetsLoadedListener.onTweetsLoadSuccess(userLikedTweets, false);
 
             } catch(Throwable t) {
                 t.printStackTrace();
@@ -344,11 +473,11 @@ public class TweetDaoImpl implements TweetDao {
         if (CachingStrategy.CacheOnly == cachingStrategy) {
 
             try {
-                String mentionedTweetsString = getStringFromRaw(context, R.raw.deborshisaha_user_timeline);
-                JSONArray mentionedTweetsJSONArray = new JSONArray(mentionedTweetsString);
-                List<Tweet> mentionedTweets = getArrayOfTweetObjects(mentionedTweetsJSONArray, true);
-                PersistenceManager.persistTweets(mentionedTweets);
-                onTweetsLoadedListener.onTweetsLoaded(Tweet.all(), false);
+                String userTimelineTweetsString = getStringFromRaw(context, R.raw.deborshisaha_user_timeline);
+                JSONArray userTimelineTweetsJSONArray = new JSONArray(userTimelineTweetsString);
+                List<Tweet> userTimelineTweets = getArrayOfTweetObjects(userTimelineTweetsJSONArray, true);
+                PersistenceManager.persistTweets(userTimelineTweets);
+                //onTweetsLoadedListener.onTweetsLoadSuccess(userTimelineTweets, false);
 
             } catch(Throwable t) {
                 t.printStackTrace();

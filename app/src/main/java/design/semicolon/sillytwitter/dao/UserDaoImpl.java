@@ -16,25 +16,23 @@ import design.semicolon.sillytwitter.restclient.SillyTwitterClient;
 /**
  * Created by dsaha on 2/21/16.
  */
-public class UserDaoImpl {
+public class UserDaoImpl implements  UserDao {
 
     private SillyTwitterClient client;
 
-    public void reloadUser(final Context context, OnUsersLoadedListener onUsersLoadedListener) throws NoNetworkConnectionException {
+    public void reloadUser(final Context context, final OnUsersLoadedListener onUsersLoadedListener) throws NoNetworkConnectionException {
 
-        if (client == null) {
-            client = SillyTwitterApplication.getRestClient();
-        }
-
-        client.verifyAccountCredentials(new JsonHttpResponseHandler(){
+        SillyTwitterApplication.getRestClient().verifyAccountCredentials(new JsonHttpResponseHandler() {
 
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject jsonObject) {
                 super.onSuccess(statusCode, headers, jsonObject);
                 User.setCurrentUser(context, jsonObject);
+
+                if (onUsersLoadedListener != null) {
+                    onUsersLoadedListener.onCurrentUserLoaded(User.currentUser(context));
+                }
             }
-
-
         });
     }
 }

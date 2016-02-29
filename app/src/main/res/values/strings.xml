@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">SillyTwitter</string>
-    <string name="login_label">Login</string>
+    <string name="login_label">Connect to Twitter</string>
     <string name="new_tweet">New Tweet</string>
     <string name="user_profile">Profile</string>
     <string name="message">Message</string>
