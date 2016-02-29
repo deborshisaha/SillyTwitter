@@ -39,17 +39,22 @@ The following **bonus** features are implemented:
 
 The following **additional** features are implemented:
 
+* [x] Grid layout when for tweets which has multiple entities
+
 ## Video Walkthrough 
 
 Here's a walkthrough of implemented user stories:
 
-<img src='http://i.imgur.com/link/to/your/gif/file.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
+<img src='http://i.imgur.com/tQ4G6DT.gifv' title='Video Walkthrough' width='' alt='Video Walkthrough' />
 
 GIF created with [LiceCap](http://www.cockos.com/licecap/).
 
 ## Notes
 
 Describe any challenges encountered while building the app.
+
+* I wanted to create profile picture image similar to Twitter's user profile page. I found it difficult to understand how NestedScrollView CoordinatorLayout and etc  will work together to create similar effect.
+* Also Imageviews in recyclerViews are giving me trouble. Images don't render most of the time.
 
 ## Open-source libraries used
 
