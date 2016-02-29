@@ -22,8 +22,7 @@
             android:layout_weight="5"
             android:padding="1dp"
             android:adjustViewBounds="true"
-            android:id="@+id/image_one_imageview"
-            android:background="@drawable/bordered_image"/>
+            android:id="@+id/image_one_imageview" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -40,7 +39,6 @@
                 android:scaleType="fitXY"
                 android:adjustViewBounds="true"
                 android:layout_weight="5"
-                android:background="@drawable/bordered_image"
                 android:id="@+id/image_two_imageview"/>
 
             <ImageView
@@ -50,7 +48,6 @@
                 android:scaleType="fitXY"
                 android:layout_weight="5"
                 android:adjustViewBounds="true"
-                android:background="@drawable/bordered_image"
                 android:id="@+id/image_three_imageview"/>
 
         </LinearLayout>

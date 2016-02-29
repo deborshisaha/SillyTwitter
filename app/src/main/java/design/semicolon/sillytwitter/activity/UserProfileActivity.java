@@ -34,20 +34,20 @@ public class UserProfileActivity extends AppCompatActivity {
 //    @Bind(R.id.toolbar)
 //    Toolbar mToolbar;
 //
-//    @Bind(R.id.user_profile_banner_image_view)
-//    ImageView mUserProfileBannerImageView;
+    @Bind(R.id.user_profile_banner_image_view)
+    ImageView mUserProfileBannerImageView;
 
-//    @Bind(R.id.user_profile_picture_imageview)
-//    RoundedImageView mUserProfilePictureImageView;
-//
-//    @Bind(R.id.user_screen_name_textview)
-//    TextView mUserScreenNameTextView;
-//
-//    @Bind(R.id.user_full_name_textview)
-//    TextView mUserFullnameTextView;
-//
-//    @Bind(R.id.user_about_textview)
-//    TextView mUserBioTextView;
+    @Bind(R.id.user_profile_picture_imageview)
+    RoundedImageView mUserProfilePictureImageView;
+
+    @Bind(R.id.user_screen_name_textview)
+    TextView mUserScreenNameTextView;
+
+    @Bind(R.id.user_full_name_textview)
+    TextView mUserFullnameTextView;
+
+    @Bind(R.id.user_about_textview)
+    TextView mUserBioTextView;
 //
 //    @Bind(R.id.user_location_name_textview)
 //    TextView mUserLocationTextView;
@@ -135,20 +135,20 @@ public class UserProfileActivity extends AppCompatActivity {
 
     private void populatePageWithUserInfo(User profileForUser) {
 
-//        if ( profileForUser != null && profileForUser.getProfileBannerImageURL()!=null) {
-//            Log.d("DEBUG", "getProfileBannerImageURL:"+profileForUser.getProfileBannerImageURL());
-//            Glide.with(this).load(profileForUser.getProfileBannerImageURL()).into(mUserProfileBannerImageView);
-//        }
+        if ( profileForUser != null && profileForUser.getProfileBannerImageURL()!=null) {
+            Log.d("DEBUG", "getProfileBannerImageURL:"+profileForUser.getProfileBannerImageURL());
+            Glide.with(this).load(profileForUser.getProfileBannerImageURL()).into(mUserProfileBannerImageView);
+        }
 
-//        if ( profileForUser != null && profileForUser.getUserProfilePictureURLString()!=null) {
-//            Log.d("DEBUG", "getUserProfilePictureURLString:"+profileForUser.getUserProfilePictureURLString());
-//            Glide.with(this).load(profileForUser.getUserProfilePictureURLString()).into(mUserProfilePictureImageView);
-//        }
-//
-//        mUserFullnameTextView.setText(profileForUser.getFullName());
-//        mUserScreenNameTextView.setText(profileForUser.getUserName());
-//
-//        mUserBioTextView.setText(profileForUser.getBio());
+        if ( profileForUser != null && profileForUser.getUserProfilePictureURLString()!=null) {
+            Log.d("DEBUG", "getUserProfilePictureURLString:"+profileForUser.getUserProfilePictureURLString());
+            Glide.with(this).load(profileForUser.getUserProfilePictureURLString()).into(mUserProfilePictureImageView);
+        }
+
+        mUserFullnameTextView.setText(profileForUser.getFullName());
+        mUserScreenNameTextView.setText(profileForUser.getUserName());
+
+        mUserBioTextView.setText(profileForUser.getBio());
 //
 //        if (profileForUser.getLocation() == null || profileForUser.getLocation().length() == 0) {
 //            mUserLocationImageView.setVisibility(View.GONE);

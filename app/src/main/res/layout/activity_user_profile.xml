@@ -4,6 +4,69 @@
     android:layout_width="wrap_content"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <include layout="@layout/content_user_profile" />
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="120dp"
+        android:layout_alignParentTop="true"
+        android:id="@+id/user_profile_banner_image_view" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="145dp"
+        android:id="@+id/user_info_view"
+        android:layout_marginTop="-37dp"
+        android:layout_below="@+id/user_profile_banner_image_view">
+
+        <com.makeramen.roundedimageview.RoundedImageView
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/user_profile_picture_imageview"
+            android:layout_width="74dp"
+            android:layout_height="74dp"
+            android:layout_marginLeft="5dp"
+            android:layout_centerHorizontal="true"
+
+            app:riv_corner_radius="10dp"
+            app:riv_border_width="2dp"
+            app:riv_border_color="#FFFFFF"
+            app:riv_mutate_background="true"  />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/user_profile_picture_imageview"
+            android:id="@+id/user_full_name_textview"
+            android:layout_centerHorizontal="true"
+            android:textAlignment="center"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="@color/black_color"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/user_full_name_textview"
+            android:id="@+id/user_screen_name_textview"
+            android:layout_centerHorizontal="true"
+            android:textAlignment="center"
+            android:textSize="12sp"
+            android:textColor="@color/black_color"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/user_screen_name_textview"
+            android:id="@+id/user_about_textview"
+            android:layout_centerHorizontal="true"
+            android:textAlignment="center"
+            android:textStyle="italic"
+            android:textSize="12sp"
+            android:textColor="@color/black_color"/>
+
+    </RelativeLayout>
+
+    <include layout="@layout/content_user_profile"
+        android:layout_below="@+id/user_info_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
 
 </RelativeLayout>
